@@ -7,7 +7,7 @@ const AuthContext = React.createContext<{
   signIn: (data: {
     email: string;
     password: string;
-    setLoading: (value: React.SetStateAction<boolean>) => void;
+    setLoading?: (value: React.SetStateAction<boolean>) => void;
   }) => Promise<void> | null;
   signOut: () => Promise<void> | null;
   session?: string | null;
@@ -38,7 +38,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
     <AuthContext.Provider
       value={{
         signIn: async (data) => {
-            data.setLoading(true);
+            data.setLoading != null && data.setLoading(true);
 
             try{
                 const response = await signInWithEmailAndPassword(firebaseAuth, data.email, data.password);

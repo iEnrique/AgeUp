@@ -1,9 +1,8 @@
 import ButtonAgeup from "@/components/ButtonAgeup";
 import TextInputAgeup from "@/components/TextInputAgeup";
-import { useSession } from "@/utilities/context/authContext";
-import { Link } from "expo-router";
+import { Title } from "@/components/Title";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -12,27 +11,47 @@ import {
   Pressable,
   Dimensions,
   DimensionValue,
-  GestureResponderEvent,
 } from "react-native";
+
+import {
+  Control,
+  Controller,
+  SubmitHandler,
+  UseFormHandleSubmit,
+  useForm,
+} from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  TypesSchemaSignUp,
+  schemaSignUp,
+} from "@/utilities/validations/signup";
 
 import DatePicker from "react-native-date-picker";
 
 import { RadialGradient } from "react-native-gradients";
+import { httpSignUp } from "@/utilities/http/auth";
 
 export default function SignUp() {
+  const form = useForm();
+  const { handleSubmit, watch, control, setValue } = useForm({
+    resolver: yupResolver(schemaSignUp),
+  });
+
   const { height, width } = Dimensions.get("window");
 
   const [step, setStep] = useState(0);
   const [gender, setGender] = useState(0);
-  const [birthday, setBirthday] = useState<Date>();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const birthday = watch("birthday");
   const [loading, setLoading] = useState(false);
 
-  var signupBackgroundBottom = -30 as DimensionValue;
+  //REMOVE WHEN LAUNCHING THE APP
+  useEffect(() => {
+    setValue('birthday', new Date());
+  }, [setValue])
+
+  var signupBackgroundBottom = -10 as DimensionValue;
   var widthBackgroundBottom = 300;
-  var heightBackgroundBottom = 600;
+  var heightBackgroundBottom = 400;
 
   if (height > 750) {
     signupBackgroundBottom = -20 as DimensionValue;
@@ -82,6 +101,7 @@ export default function SignUp() {
         />
 
         <View style={styles.container}>
+          <Title text={"Sign up"}></Title>
           {step == 0 && (
             <StepGender
               gender={gender}
@@ -90,22 +110,24 @@ export default function SignUp() {
             ></StepGender>
           )}
           {step == 1 && (
-            <StepBirthdayAndUsername
-              birthday={birthday}
-              username={username}
-              setBirthday={setBirthday}
-              setUsername={setUsername}
+            <StepNameAndBirthday
+              control={control}
               setStep={setStep}
-            ></StepBirthdayAndUsername>
+              birthday={birthday}
+            ></StepNameAndBirthday>
           )}
           {step == 2 && (
-            <StepEmailAndPassword
-              email={email}
-              password={password}
-              setEmail={setEmail}
-              setPassword={setPassword}
+            <StepUsernameAndPassword
+              control={control}
               setStep={setStep}
-            ></StepEmailAndPassword>
+            ></StepUsernameAndPassword>
+          )}
+          {step == 3 && (
+            <StepEmail
+              control={control}
+              setStep={setStep}
+              handleSubmit={handleSubmit}
+            ></StepEmail>
           )}
         </View>
       </View>
@@ -122,6 +144,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-start",
+    textAlign: "center",
     alignItems: "center",
     padding: 30,
     rowGap: 15,
@@ -170,14 +193,25 @@ interface PropsStepGender {
 }
 
 function StepGender(props: PropsStepGender) {
+  function switchToSignIn() {
+    if (router.canGoBack()) {
+      router.back();
+      setTimeout(() => {
+        router.push("/signin");
+      }, 300);
+    } else {
+      router.replace("/signin");
+    }
+  }
+
   return (
     <>
-      <Text style={{ fontSize: 17 }}>
-        Do you have an account already?{" "}
-        <Link href="/signin" style={{ fontWeight: "bold" }}>
-          Log in
-        </Link>
-      </Text>
+      <View style={{ flexDirection: "row" }}>
+        <Text style={{ fontSize: 17 }}>Already signed up? </Text>
+        <Pressable onPress={() => switchToSignIn()}>
+          <Text style={{ fontSize: 17, fontWeight: "bold" }}>Log in</Text>
+        </Pressable>
+      </View>
       <View style={styles.genderContainer}>
         <Pressable
           style={styles.genderButton}
@@ -218,95 +252,161 @@ function StepGender(props: PropsStepGender) {
           />
         </Pressable>
       </View>
-      <ButtonAgeup title="Next step" onPress={() => props.setStep(1)}></ButtonAgeup>
+      <ButtonAgeup
+        title="Next step"
+        type="success"
+        onPress={() => props.setStep(1)}
+      ></ButtonAgeup>
     </>
   );
 }
 
-interface PropsStepBirthdayAndUsername {
-  setBirthday: React.Dispatch<React.SetStateAction<Date | undefined>>;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
-  birthday: Date | undefined;
-  username: string;
+interface PropsSteps {
+  control: Control<any>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 }
 
-function StepBirthdayAndUsername(props: PropsStepBirthdayAndUsername) {
+interface PropsStepsNameaAndBirthday {
+  control: Control<any>;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+  birthday: Date | undefined;
+}
+
+function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <View style={styles.stepsContainer}>
+        <Text style={{ fontSize: 17, textAlign: "center" }}>
+          You're a step closer to joining!
+        </Text>
         <TextInputAgeup
-          value={props.birthday != undefined ? props.birthday.toString() : ""}
-          placeholder="Date of birth"
-          onPressIn={() => setOpen(true)}
-          editable={false}
-          selectTextOnFocus={false}
-        />
-        <DatePicker
+          autoCapitalize="words"
+          placeholder="Name"
+          control={props.control}
+          name="name"
+        ></TextInputAgeup>
+        <Controller
+    control={props.control}
+    name='birthday'
+    render={({ field, fieldState }) => {
+
+        console.log(field.value);
+
+        return <><TextInputAgeup
+        placeholder="Date of birth"
+        name="birthday"
+        editable={false}
+        selectTextOnFocus={false}
+        control={props.control}
+      /><DatePicker
           modal
           open={open}
-          date={props.birthday != undefined ? props.birthday : new Date()}
+          date={field.value != undefined ? field.value : new Date()}
           onConfirm={(date) => {
+            field.onChange(new Date());
             setOpen(false);
-            props.setBirthday(date);
           }}
           onCancel={() => {
             setOpen(false);
           }}
-        ></DatePicker>
-        <TextInputAgeup
-          keyboardType="visible-password"
-          secureTextEntry={true}
-          value={props.username}
-          autoCapitalize="none"
-          placeholder="Password"
-          onChangeText={(text) => props.setUsername(text)}
-        ></TextInputAgeup>
+        ></DatePicker></>}} />
       </View>
-      <ButtonAgeup title="Next step" onPress={() => props.setStep(2)}></ButtonAgeup>
+      <ButtonAgeup
+        type="success"
+        title="Next step"
+        onPress={() => { props.setStep(2)} }
+      ></ButtonAgeup>
+      <ButtonAgeup
+        type="default"
+        title="Go back"
+        onPress={() => props.setStep(0)}
+      ></ButtonAgeup>
     </>
   );
 }
 
-interface PropsStepEmailAndPassword {
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  email: string;
-  password: string;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-}
-
-function StepEmailAndPassword(props: PropsStepEmailAndPassword) {
+function StepUsernameAndPassword(props: PropsSteps) {
   return (
     <>
       <View style={styles.stepsContainer}>
+        <Text style={{ fontSize: 17, textAlign: "center" }}>
+          Just a few more details...
+        </Text>
         <TextInputAgeup
-          keyboardType="email-address"
-          value={props.email}
           autoCapitalize="none"
-          placeholder="Email"
-          onChangeText={(text) => props.setEmail(text)}
+          placeholder="Username"
+          name="username"
+          control={props.control}
         ></TextInputAgeup>
         <TextInputAgeup
           keyboardType="visible-password"
           secureTextEntry={true}
-          value={props.password}
           autoCapitalize="none"
           placeholder="Password"
-          onChangeText={(text) => props.setPassword(text)}
+          name="password"
+          control={props.control}
         ></TextInputAgeup>
         <TextInputAgeup
           keyboardType="visible-password"
           secureTextEntry={true}
-          value={""}
           autoCapitalize="none"
           placeholder="Repeat password"
-          onChangeText={(text) => props.setPassword(text)}
+          control={props.control}
+          name="passwordverification"
         ></TextInputAgeup>
       </View>
-      <ButtonAgeup title="Next step"></ButtonAgeup>
+      <ButtonAgeup
+        type="success"
+        title="Next step"
+        onPress={() => props.setStep(3)}
+      ></ButtonAgeup>
+      <ButtonAgeup
+        type="default"
+        title="Go back"
+        onPress={() => props.setStep(1)}
+      ></ButtonAgeup>
+    </>
+  );
+}
+
+interface PropsStepsEmail {
+  control: Control<any>;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+  handleSubmit: UseFormHandleSubmit<TypesSchemaSignUp>;
+}
+
+function StepEmail(props: PropsStepsEmail) {
+  return (
+    <>
+      <View style={styles.stepsContainer}>
+        <Text style={{ fontSize: 17, textAlign: "center" }}>Last step!</Text>
+        <TextInputAgeup
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholder="Email"
+          name="email"
+          control={props.control}
+        ></TextInputAgeup>
+      </View>
+      <ButtonAgeup
+        type="success"
+        title="Next step"
+        onPress={props.handleSubmit(async (data: TypesSchemaSignUp) => {
+          try{
+            await httpSignUp(data);
+            router.replace('/');
+          } catch(error) {
+            console.log(error);
+          }
+        })}
+      />
+      <ButtonAgeup
+        type="default"
+        title="Go back"
+        onPress={() => props.setStep(2)}
+      />
     </>
   );
 }

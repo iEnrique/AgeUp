@@ -11,7 +11,7 @@ export default function TabOneScreen() {
         <View style={styles.header}>
           <View style={{ flex: 2 }}>
             <Text style={styles.welcome}>Welcome,</Text>
-            <Text style={styles.name}>Enrique</Text>
+            <Text style={styles.name}>[name]</Text>
           </View>
           <View
             style={{

@@ -1,5 +1,6 @@
 import ButtonAgeup from "@/components/ButtonAgeup";
 import TextInputAgeup from "@/components/TextInputAgeup";
+import { Title } from "@/components/Title";
 import { useSession } from "@/utilities/context/authContext";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -13,6 +14,10 @@ import {
   DimensionValue,
 } from "react-native";
 
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schemaSignIn } from "@/utilities/validations/signin";
+
 import { RadialGradient } from "react-native-gradients";
 
 export default function SignIn() {
@@ -20,8 +25,6 @@ export default function SignIn() {
 
   const { signIn } = useSession();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   var castleBottom = -40 as DimensionValue;
@@ -36,6 +39,20 @@ export default function SignIn() {
     { offset: "70%", color: "#f3e4d4", opacity: "1" },
     { offset: "100%", color: "#cbb094", opacity: "1" },
   ];
+
+  function switchToSignUp() {
+    if (router.canGoBack()) {
+      router.back();
+      setTimeout(() => {
+        router.push("/signup");
+      }, 300);
+    } else {
+      router.replace("/signup");
+    }
+  }
+
+  const form = useForm();
+  const { handleSubmit, control } = useForm({resolver: yupResolver(schemaSignIn)});
 
   return (
     <>
@@ -55,33 +72,41 @@ export default function SignIn() {
         />
 
         <View style={styles.container}>
+          <Title text={"Log in"}></Title>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ fontSize: 17 }}>Are you new to AgeUp? </Text>
+            <Pressable onPress={() => switchToSignUp()}>
+              <Text style={{ fontSize: 17, fontWeight: "bold" }}>Sign up</Text>
+            </Pressable>
+          </View>
           <TextInputAgeup
             keyboardType="email-address"
-            value={email}
             autoCapitalize="none"
             placeholder="Email"
-            onChangeText={(text) => setEmail(text)}
+            name="email"
+            control={control}
           ></TextInputAgeup>
           <TextInputAgeup
             keyboardType="visible-password"
             secureTextEntry={true}
-            value={password}
+            name="password"
             autoCapitalize="none"
             placeholder="Password"
-            onChangeText={(text) => setPassword(text)}
+            control={control}
           ></TextInputAgeup>
           <ButtonAgeup
             title="Log in"
-            onPress={async () => {
+            type="success"
+            onPress={handleSubmit(async (data) => {
               await signIn({
-                email: email,
-                password: password,
+                email: data.email,
+                password: data.password,
                 setLoading: setLoading,
               });
               // Navigate after signing in. You may want to tweak this to ensure sign-in is
               // successful before navigating.
               router.replace("/");
-            }}
+            })}
           ></ButtonAgeup>
         </View>
       </View>
@@ -111,5 +136,5 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     resizeMode: "contain",
     aspectRatio: 1,
-  }
+  },
 });
