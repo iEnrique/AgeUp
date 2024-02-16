@@ -1,6 +1,6 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import {
-    Animated,
+  Animated,
   Easing,
   Image,
   ImageBackground,
@@ -10,22 +10,39 @@ import {
   View,
 } from "react-native";
 
-export default function AuthScreen() {
-    const backgroundMovement = new Animated.Value(0);
+import * as AppleAuthentication from "expo-apple-authentication";
+import { OAuthProvider, signInWithCredential } from "firebase/auth";
+import { firebaseAuth } from "@/firebaseConfig";
+import { useSession } from "@/utilities/context/authContext";
 
-    Animated.sequence([
-        Animated.delay(0),
-        Animated.timing(backgroundMovement, {
-          toValue: -50,
-          duration: 40000,
-          easing: Easing.linear,
-          useNativeDriver: false,
-        }),
-      ]).start()
+export default function AuthScreen() {
+  const backgroundMovement = new Animated.Value(0);
+
+  Animated.sequence([
+    Animated.delay(0),
+    Animated.timing(backgroundMovement, {
+      toValue: -50,
+      duration: 40000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }),
+  ]).start();
+
+  const { signInWithApple } = useSession();
 
   return (
     <>
-      <Animated.View style={[styles.backgroundContainer, {left: backgroundMovement.interpolate({ inputRange: [0, 50], outputRange: ['0%', '50%']})}]}>
+      <Animated.View
+        style={[
+          styles.backgroundContainer,
+          {
+            left: backgroundMovement.interpolate({
+              inputRange: [0, 50],
+              outputRange: ["0%", "50%"],
+            }),
+          },
+        ]}
+      >
         <ImageBackground
           source={require("../assets/images/auth-background.png")}
           style={styles.background}
@@ -57,6 +74,16 @@ export default function AuthScreen() {
             <Text style={styles.signup}>Sign up</Text>
           </Pressable>
         </Link>
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={100}
+          style={styles.button}
+          onPress={async () => {
+            await signInWithApple();
+            router.replace("/");
+          }}
+        />
       </View>
     </>
   );
@@ -93,17 +120,18 @@ const styles = StyleSheet.create({
     width: 350,
     height: 350,
     //transform: "rotate(-50deg)",
-    transform: [{rotate: "-50deg"}],
+    transform: [{ rotate: "-50deg" }],
     right: "-33%",
     top: "15%",
   },
   button: {
-    paddingHorizontal: '10%',
-    paddingVertical: '5%',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     width: "100%",
     borderRadius: 1000,
     marginBottom: 20,
     textAlign: "center",
+    justifyContent: "center",
     borderColor: "#FFF",
     borderWidth: 4,
     shadowOffset: { width: 0, height: 10 },

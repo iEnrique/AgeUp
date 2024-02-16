@@ -103,8 +103,7 @@ export default function SignIn() {
                 password: data.password,
                 setLoading: setLoading,
               });
-              // Navigate after signing in. You may want to tweak this to ensure sign-in is
-              // successful before navigating.
+
               router.replace("/");
             })}
           ></ButtonAgeup>

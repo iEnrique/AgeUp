@@ -1,12 +1,16 @@
 import React from "react";
 import { useStorageState } from "../hooks/useStorageState";
 import { firebaseAuth } from "@/firebaseConfig";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { OAuthProvider, signInWithCredential, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 const AuthContext = React.createContext<{
   signIn: (data: {
     email: string;
     password: string;
+    setLoading?: (value: React.SetStateAction<boolean>) => void;
+  }) => Promise<void> | null;
+  signInWithApple: (data?: {
     setLoading?: (value: React.SetStateAction<boolean>) => void;
   }) => Promise<void> | null;
   signOut: () => Promise<void> | null;
@@ -15,6 +19,7 @@ const AuthContext = React.createContext<{
 }>({
   signIn: () => null,
   signOut: () => null,
+  signInWithApple: () => null,
   session: null,
   isLoading: false,
 });
@@ -42,13 +47,42 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
             try{
                 const response = await signInWithEmailAndPassword(firebaseAuth, data.email, data.password);
-                console.log("Hola: "+response.user.toString());
                 setSession(response.user.toString());
             } catch(error: any) {
                 console.log(error);
                 alert('Sign-in failed: '+error.message);
             }
         },
+        signInWithApple: async (data) => {
+          data != null && data.setLoading != null && data.setLoading(true);
+
+          try {
+            const credential = await AppleAuthentication.signInAsync({
+              requestedScopes: [
+                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                AppleAuthentication.AppleAuthenticationScope.EMAIL,
+              ],
+            });
+            // signed in
+            const { identityToken } = credential;
+            if(identityToken){
+              const provider = new OAuthProvider('apple.com');
+              provider.addScope('email');
+              provider.addScope('name');
+              const credential = provider.credential({ idToken: identityToken });
+              await signInWithCredential(firebaseAuth, credential).then((user) => {
+                setSession(user.toString());
+              });
+            }
+          } catch (e: any) {
+            console.log(e);
+            if (e.code === 'ERR_REQUEST_CANCELED') {
+              // handle that the user canceled the sign-in flow
+            } else {
+              // handle other errors
+            }
+          }
+      },
         signOut: async () => {
             try {
                 const response = await signOut(firebaseAuth);
