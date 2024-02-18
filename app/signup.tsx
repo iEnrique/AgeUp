@@ -172,6 +172,7 @@ export default function SignUp() {
               control={control}
               setStep={setStep}
               handleSubmit={handleSubmit}
+              signIn={signIn}
             ></StepEmail>
           )}
         </View>
@@ -444,6 +445,7 @@ interface PropsStepsEmail {
   control: Control<any>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: UseFormHandleSubmit<any>;
+  signIn: Function;
 }
 
 function StepEmail(props: PropsStepsEmail) {
@@ -464,7 +466,7 @@ function StepEmail(props: PropsStepsEmail) {
         title="Next step"
         onPress={props.handleSubmit(async (data) => {
           try {
-            httpSignUpWithEmailAndPassword(data);
+            httpSignUpWithEmailAndPassword(props.signIn, data);
           } catch (error) {
             console.log(error);
           }

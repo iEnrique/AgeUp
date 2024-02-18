@@ -58,7 +58,7 @@ export async function signInWithApple(signIn: Function) {
   }
 }
 
-export function httpSignUpWithEmailAndPassword(props: TypesSchemaSignUp) {
+export function httpSignUpWithEmailAndPassword(signIn: Function, props: TypesSchemaSignUp) {
   //Check if somebody has the same username
 
   createUserWithEmailAndPassword(firebaseAuth, props.email, props.password)
@@ -75,8 +75,6 @@ export function httpSignUpWithEmailAndPassword(props: TypesSchemaSignUp) {
         { merge: true }
       )
         .then(() => {
-          const { signIn } = useSession();
-
           signIn(userCredential.user.uid);
         })
         .catch((error) => console.log(error));
