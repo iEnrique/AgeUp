@@ -2,8 +2,11 @@ import { Image, ScrollView, StyleSheet } from "react-native";
 
 import { Text, View } from "@/components/Themed";
 import { CarouselCourses } from "@/components/CarouselCourses";
+import { useSession } from "@/utilities/context/authContext";
 
 export default function TabOneScreen() {
+  const { user } = useSession();
+
   return (
     <View style={styles.container}>
     <ScrollView contentContainerStyle={{width:'100%'}}>
@@ -11,7 +14,7 @@ export default function TabOneScreen() {
         <View style={styles.header}>
           <View style={{ flex: 2 }}>
             <Text style={styles.welcome}>Welcome,</Text>
-            <Text style={styles.name}>[name]</Text>
+            <Text style={styles.name}>{user!.name}</Text>
           </View>
           <View
             style={{
@@ -34,6 +37,7 @@ export default function TabOneScreen() {
       </View>
     </ScrollView></View>
   );
+
 }
 
 const styles = StyleSheet.create({

@@ -29,7 +29,15 @@ export default function ButtonAgeup(props: Props) {
   }
 
   return (
-    <Pressable style={({pressed}) => [styles.button, buttonTypeStyle, pressed && styles.buttonPressed, props.style]} onPress={props.onPress}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.button,
+        buttonTypeStyle,
+        pressed && styles.buttonPressed,
+        props.style,
+      ]}
+      onPress={props.onPress}
+    >
       <Text style={[styles.textButton, textTypeStyle]}>{props.title}</Text>
     </Pressable>
   );
@@ -45,11 +53,11 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 8,
     shadowColor: "#000",
-    shadowOffset: {width:0, height:0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
-    shadowRadius: 15
+    shadowRadius: 15,
   },
-  buttonPressed:{
+  buttonPressed: {
     marginTop: 5,
     borderBottomWidth: 3,
   },
@@ -62,15 +70,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#EEE",
     borderColor: "#BBB",
   },
-  defaultText:{
+  defaultText: {
     color: "#000",
   },
   successButton: {
     backgroundColor: "#6AA84F",
     borderColor: "#38761d",
-
   },
   successText: {
-    color: "#FFF"
+    color: "#FFF",
   },
 });

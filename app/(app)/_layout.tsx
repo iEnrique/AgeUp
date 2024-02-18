@@ -9,32 +9,31 @@ import {
 import { Text, View, useColorScheme } from "react-native";
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
+  const { session, signIn, isLoading, user } = useSession();
 
-  // You can keep the splash screen open, or render a loading screen like we do here.
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   if (!session) {
-    console.log("Person is not logged in");
     return <Redirect href="/auth" />;
-  }else{
+  } else {
+    const colorScheme = useColorScheme();
 
-  console.log("Person is logged in");
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colorScheme === "dark" ? "#000" : "#FFF",
-        }}
-      >
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        </Stack>
-      </View>
-    </ThemeProvider>
-  );
-}
+    return (
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colorScheme === "dark" ? "#000" : "#FFF",
+          }}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          </Stack>
+        </View>
+      </ThemeProvider>
+    );
+  }
 }

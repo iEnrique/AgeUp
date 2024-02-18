@@ -1,27 +1,110 @@
-import { firebaseAuth, firebaseFirestore } from "@/firebaseConfig"
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { TypesSchemaSignUp, schemaSignUp } from "../validations/signup";
-import { Firestore, addDoc, collection, getFirestore } from "firebase/firestore";
+import { firebaseAuth, firebaseFirestore } from "@/firebaseConfig";
+import {
+  OAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import {
+  TypesSchemaSignUp,
+  TypesSchemaSignUpWithCredential,
+} from "../validations/signup";
+import { doc, setDoc } from "firebase/firestore";
 import { useSession } from "../context/authContext";
+import * as AppleAuthentication from "expo-apple-authentication";
+import { router } from "expo-router";
 
-export function httpSignUp(props: TypesSchemaSignUp){
-    console.log('arrived here!');
+export async function httpSignInWithEmailAndPassword(
+  signIn: Function,
+  email: string,
+  password: string
+) {
+  try {
+    signInWithEmailAndPassword(firebaseAuth, email, password).then((data) => {
+      signIn(data.user.uid);
+    });
+  } catch (error: any) {
+    console.log(error);
+  }
+}
 
-    //Check if somebody has the same username
+export async function signInWithApple(signIn: Function) {
+  try {
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+    // signed in
+    const { identityToken } = credential;
+    if (identityToken) {
+      const provider = new OAuthProvider("apple.com");
+      provider.addScope("email");
+      provider.addScope("name");
+      const credential = provider.credential({ idToken: identityToken });
 
-    createUserWithEmailAndPassword(firebaseAuth, props.email, props.password).then((userCredential) => {
-        addDoc(collection(firebaseFirestore, "users"), {
-            uid: userCredential.user.uid,
-            username: props.username,
-            email: props.email,
-            name: props.name,
-            birthday: props.birthday,
-            score: 0
-        }).then(() => {
-            const { signIn } = useSession();
+      await signInWithCredential(firebaseAuth, credential).then((user) => {
+        signIn(user.user.uid);
+      });
+    }
+  } catch (e: any) {
+    console.log(e);
+    if (e.code === "ERR_REQUEST_CANCELED") {
+      // handle that the user canceled the sign-in flow
+    } else {
+      // handle other errors
+    }
+  }
+}
 
-            signIn({email: props.email, password: props.password});
+export function httpSignUpWithEmailAndPassword(props: TypesSchemaSignUp) {
+  //Check if somebody has the same username
 
-        }).catch((error) => console.log(error));
-    }).catch((error) => console.log(error));
+  createUserWithEmailAndPassword(firebaseAuth, props.email, props.password)
+    .then((userCredential) => {
+      setDoc(
+        doc(firebaseFirestore, "users", userCredential.user.uid),
+        {
+          username: props.username,
+          email: props.email,
+          name: props.name,
+          birthday: props.birthday,
+          score: 0,
+        },
+        { merge: true }
+      )
+        .then(() => {
+          const { signIn } = useSession();
+
+          signIn(userCredential.user.uid);
+        })
+        .catch((error) => console.log(error));
+    })
+    .catch((error) => console.log(error));
+}
+
+export function httpSignUpWithCredential(
+  signIn: Function,
+  props: TypesSchemaSignUpWithCredential
+) {
+  //Check if somebody has the same username
+  const uid = firebaseAuth.currentUser?.uid;
+  if (uid != null) {
+    setDoc(
+      doc(firebaseFirestore, "users", uid),
+      {
+        username: props.username,
+        email: props.email,
+        name: props.name,
+        birthday: props.birthday,
+        score: 0,
+      },
+      { merge: true }
+    ).then(() => {
+      signIn(uid);
+    });
+  } else {
+    router.replace("/");
+  }
 }

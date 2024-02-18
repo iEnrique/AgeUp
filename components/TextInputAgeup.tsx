@@ -8,6 +8,7 @@ import {
   NativeTouchEvent,
   Text,
   View,
+  TextInputSubmitEditingEventData,
 } from "react-native";
 import { Controller } from "react-hook-form";
 
@@ -20,6 +21,7 @@ interface Props {
   onChangeText?: ((text: string) => void) | undefined;
   secureTextEntry?: boolean | undefined;
   onPressIn?: ((e: NativeSyntheticEvent<NativeTouchEvent>) => void) | undefined;
+  onSubmitEditing?: ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void) | undefined;
   editable?: boolean | undefined;
   selectTextOnFocus?: boolean | undefined;
   rules?: any;
@@ -38,6 +40,7 @@ export default function TextInputAgeup(props: Props) {
         placeholder={props.placeholder}
         onChangeText={props.onChangeText}
         onPressIn={props.onPressIn}
+        onSubmitEditing={props.onSubmitEditing}
         editable={props.editable}
         selectTextOnFocus={props.selectTextOnFocus}
         secureTextEntry={props.secureTextEntry}
@@ -68,6 +71,7 @@ export default function TextInputAgeup(props: Props) {
             onChangeText={onChange}
             onBlur={onBlur}
             onPressIn={props.onPressIn}
+            onSubmitEditing={props.onSubmitEditing}
             editable={props.editable}
             selectTextOnFocus={props.selectTextOnFocus}
             secureTextEntry={props.secureTextEntry}

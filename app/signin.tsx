@@ -19,11 +19,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { schemaSignIn } from "@/utilities/validations/signin";
 
 import { RadialGradient } from "react-native-gradients";
+import { httpSignInWithEmailAndPassword } from "@/utilities/http/auth";
 
 export default function SignIn() {
   const { height, width } = Dimensions.get("window");
 
-  const { signIn } = useSession();
+  const { signIn, session } = useSession();
 
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +53,9 @@ export default function SignIn() {
   }
 
   const form = useForm();
-  const { handleSubmit, control } = useForm({resolver: yupResolver(schemaSignIn)});
+  const { handleSubmit, control } = useForm({
+    resolver: yupResolver(schemaSignIn),
+  });
 
   return (
     <>
@@ -98,13 +101,13 @@ export default function SignIn() {
             title="Log in"
             type="success"
             onPress={handleSubmit(async (data) => {
-              await signIn({
-                email: data.email,
-                password: data.password,
-                setLoading: setLoading,
+              httpSignInWithEmailAndPassword(
+                signIn,
+                data.email,
+                data.password
+              ).then(() => {
+                router.replace("/");
               });
-
-              router.replace("/");
             })}
           ></ButtonAgeup>
         </View>

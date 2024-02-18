@@ -23,31 +23,55 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   TypesSchemaSignUp,
+  TypesSchemaSignUpWithCredential,
   schemaSignUp,
+  schemaSignUpWithCredential,
 } from "@/utilities/validations/signup";
 
 import DatePicker from "react-native-date-picker";
 
 import { RadialGradient } from "react-native-gradients";
-import { httpSignUp } from "@/utilities/http/auth";
+import {
+  httpSignUpWithCredential,
+  httpSignUpWithEmailAndPassword,
+} from "@/utilities/http/auth";
+import { useLocalSearchParams } from "expo-router";
+import { firebaseAuth } from "@/firebaseConfig";
+import { useSession } from "@/utilities/context/authContext";
 
 export default function SignUp() {
-  const form = useForm();
-  const { handleSubmit, watch, control, setValue } = useForm({
-    resolver: yupResolver(schemaSignUp),
+  const { isCredential } = useLocalSearchParams();
+  const credential: boolean =
+    parseInt(isCredential as string) == 1 ? true : false;
+
+  const {
+    handleSubmit,
+    watch,
+    control,
+    setValue,
+    getValues,
+    clearErrors,
+    formState,
+  } = useForm({
+    resolver: yupResolver(
+      credential ? schemaSignUpWithCredential : schemaSignUp
+    ),
   });
+
+  const { signIn, signOut } = useSession();
 
   const { height, width } = Dimensions.get("window");
 
   const [step, setStep] = useState(0);
   const [gender, setGender] = useState(0);
   const birthday = watch("birthday");
+  const name = watch("name");
   const [loading, setLoading] = useState(false);
 
   //REMOVE WHEN LAUNCHING THE APP
   useEffect(() => {
-    setValue('birthday', new Date());
-  }, [setValue])
+    setValue("birthday", new Date());
+  }, [setValue]);
 
   var signupBackgroundBottom = -10 as DimensionValue;
   var widthBackgroundBottom = 300;
@@ -71,6 +95,21 @@ export default function SignUp() {
     { offset: "70%", color: "#f3e4d4", opacity: "1" },
     { offset: "100%", color: "#cbb094", opacity: "1" },
   ];
+
+  function createUsernameAndPasswordWithCredential() {
+    const email = firebaseAuth.currentUser?.email;
+    if (email == null) {
+      signOut();
+    } else {
+      const name =
+        firebaseAuth.currentUser?.displayName != null
+          ? firebaseAuth.currentUser.displayName.toLowerCase()
+          : "user";
+      const random = Math.floor(Math.random() * (9999999 - 1 + 1)) + 1;
+      setValue("username", name + random);
+      setValue("email", email);
+    }
+  }
 
   return (
     <>
@@ -114,6 +153,12 @@ export default function SignUp() {
               control={control}
               setStep={setStep}
               birthday={birthday}
+              credential={credential}
+              createUsernameAndPasswordWithCredential={
+                createUsernameAndPasswordWithCredential
+              }
+              handleSubmit={handleSubmit}
+              signIn={signIn}
             ></StepNameAndBirthday>
           )}
           {step == 2 && (
@@ -270,6 +315,10 @@ interface PropsStepsNameaAndBirthday {
   control: Control<any>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   birthday: Date | undefined;
+  credential: boolean;
+  createUsernameAndPasswordWithCredential: Function;
+  handleSubmit: UseFormHandleSubmit<TypesSchemaSignUpWithCredential>;
+  signIn: Function;
 }
 
 function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
@@ -288,36 +337,56 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
           name="name"
         ></TextInputAgeup>
         <Controller
-    control={props.control}
-    name='birthday'
-    render={({ field, fieldState }) => {
-
-        console.log(field.value);
-
-        return <><TextInputAgeup
-        placeholder="Date of birth"
-        name="birthday"
-        editable={false}
-        selectTextOnFocus={false}
-        control={props.control}
-      /><DatePicker
-          modal
-          open={open}
-          date={field.value != undefined ? field.value : new Date()}
-          onConfirm={(date) => {
-            field.onChange(new Date());
-            setOpen(false);
+          control={props.control}
+          name="birthday"
+          render={({ field, fieldState }) => {
+            return (
+              <>
+                <TextInputAgeup
+                  placeholder="Date of birth"
+                  name="birthday"
+                  editable={false}
+                  selectTextOnFocus={false}
+                  control={props.control}
+                />
+                <DatePicker
+                  modal
+                  open={open}
+                  date={field.value != undefined ? field.value : new Date()}
+                  onConfirm={(date) => {
+                    field.onChange(new Date());
+                    setOpen(false);
+                  }}
+                  onCancel={() => {
+                    setOpen(false);
+                  }}
+                ></DatePicker>
+              </>
+            );
           }}
-          onCancel={() => {
-            setOpen(false);
-          }}
-        ></DatePicker></>}} />
+        />
       </View>
-      <ButtonAgeup
-        type="success"
-        title="Next step"
-        onPress={() => { props.setStep(2)} }
-      ></ButtonAgeup>
+      {props.credential ? (
+        <ButtonAgeup
+          type="success"
+          title="Sign up"
+          onPress={() => {
+            props.createUsernameAndPasswordWithCredential();
+
+            props.handleSubmit(async (data) => {
+              httpSignUpWithCredential(props.signIn, data);
+            })();
+          }}
+        ></ButtonAgeup>
+      ) : (
+        <ButtonAgeup
+          type="success"
+          title="Next step"
+          onPress={() => {
+            props.setStep(2);
+          }}
+        ></ButtonAgeup>
+      )}
       <ButtonAgeup
         type="default"
         title="Go back"
@@ -374,7 +443,7 @@ function StepUsernameAndPassword(props: PropsSteps) {
 interface PropsStepsEmail {
   control: Control<any>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
-  handleSubmit: UseFormHandleSubmit<TypesSchemaSignUp>;
+  handleSubmit: UseFormHandleSubmit<any>;
 }
 
 function StepEmail(props: PropsStepsEmail) {
@@ -393,11 +462,10 @@ function StepEmail(props: PropsStepsEmail) {
       <ButtonAgeup
         type="success"
         title="Next step"
-        onPress={props.handleSubmit(async (data: TypesSchemaSignUp) => {
-          try{
-            await httpSignUp(data);
-            router.replace('/');
-          } catch(error) {
+        onPress={props.handleSubmit(async (data) => {
+          try {
+            httpSignUpWithEmailAndPassword(data);
+          } catch (error) {
             console.log(error);
           }
         })}

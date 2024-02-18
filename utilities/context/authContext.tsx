@@ -1,30 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { firebaseAuth, firebaseFirestore } from "@/firebaseConfig";
+import { signOut as signOutFirebase } from "firebase/auth";
+import { UserModel } from "../models/UserModel";
+import { doc, getDoc } from "firebase/firestore";
 import { useStorageState } from "../hooks/useStorageState";
-import { firebaseAuth } from "@/firebaseConfig";
-import { OAuthProvider, signInWithCredential, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import * as AppleAuthentication from 'expo-apple-authentication';
+import { router } from "expo-router";
 
 const AuthContext = React.createContext<{
-  signIn: (data: {
-    email: string;
-    password: string;
-    setLoading?: (value: React.SetStateAction<boolean>) => void;
-  }) => Promise<void> | null;
-  signInWithApple: (data?: {
-    setLoading?: (value: React.SetStateAction<boolean>) => void;
-  }) => Promise<void> | null;
-  signOut: () => Promise<void> | null;
+  signIn: (uid: string) => void;
+  signOut: () => void;
   session?: string | null;
+  user?: UserModel | null;
   isLoading: boolean;
 }>({
-  signIn: () => null,
-  signOut: () => null,
-  signInWithApple: () => null,
+  signIn: () => {},
+  signOut: () => {},
   session: null,
+  user: null,
   isLoading: false,
 });
 
-// This hook can be used to access the user info.
 export function useSession() {
   const value = React.useContext(AuthContext);
   if (process.env.NODE_ENV !== "production") {
@@ -37,66 +32,58 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
+  const [user, setUser] = useState<UserModel | null>(null);
   const [[isLoading, session], setSession] = useStorageState("session");
 
+  const signIn = async (uid: string) => {
+    try {
+      const userDoc = doc(firebaseFirestore, "users", uid);
+      const userData = await getDoc(userDoc);
+
+      if (userData.exists()) {
+        const user = userData.data();
+        const newSession = {
+          userId: uid,
+          username: user.username,
+          name: user.name,
+          birthday: user.birthday,
+          email: user.email,
+          gender: user.gender,
+        };
+        setUser(newSession);
+        setSession(uid);
+
+        router.replace("/");
+      } else {
+        router.push({ pathname: "/signup", params: { isCredential: 1 } });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await signOutFirebase(firebaseAuth);
+
+      setSession(null);
+      setUser(null);
+    } catch (error) {
+      console.log(error);
+      alert("Sign-out failed: " + error);
+    }
+  };
+
+  const contextValue = {
+    signIn,
+    signOut,
+    session,
+    user,
+    isLoading,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        signIn: async (data) => {
-            data.setLoading != null && data.setLoading(true);
-
-            try{
-                const response = await signInWithEmailAndPassword(firebaseAuth, data.email, data.password);
-                setSession(response.user.toString());
-            } catch(error: any) {
-                console.log(error);
-                alert('Sign-in failed: '+error.message);
-            }
-        },
-        signInWithApple: async (data) => {
-          data != null && data.setLoading != null && data.setLoading(true);
-
-          try {
-            const credential = await AppleAuthentication.signInAsync({
-              requestedScopes: [
-                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                AppleAuthentication.AppleAuthenticationScope.EMAIL,
-              ],
-            });
-            // signed in
-            const { identityToken } = credential;
-            if(identityToken){
-              const provider = new OAuthProvider('apple.com');
-              provider.addScope('email');
-              provider.addScope('name');
-              const credential = provider.credential({ idToken: identityToken });
-              await signInWithCredential(firebaseAuth, credential).then((user) => {
-                setSession(user.toString());
-              });
-            }
-          } catch (e: any) {
-            console.log(e);
-            if (e.code === 'ERR_REQUEST_CANCELED') {
-              // handle that the user canceled the sign-in flow
-            } else {
-              // handle other errors
-            }
-          }
-      },
-        signOut: async () => {
-            try {
-                const response = await signOut(firebaseAuth);
-                setSession(null);
-            }catch(error: any){
-                console.log(error);
-                alert('Sign-out failed: '+error.message);
-            }
-
-        },
-        session,
-        isLoading,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {props.children}
     </AuthContext.Provider>
   );

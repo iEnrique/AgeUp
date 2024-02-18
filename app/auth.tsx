@@ -14,6 +14,8 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { OAuthProvider, signInWithCredential } from "firebase/auth";
 import { firebaseAuth } from "@/firebaseConfig";
 import { useSession } from "@/utilities/context/authContext";
+import { signInWithApple } from "@/utilities/http/auth";
+import { useEffect } from "react";
 
 export default function AuthScreen() {
   const backgroundMovement = new Animated.Value(0);
@@ -28,7 +30,7 @@ export default function AuthScreen() {
     }),
   ]).start();
 
-  const { signInWithApple } = useSession();
+  const { signIn } = useSession();
 
   return (
     <>
@@ -53,11 +55,12 @@ export default function AuthScreen() {
         source={require("@/assets/images/squirrel-auth.png")}
       />
       <View style={styles.container}>
+        <View style={{flexDirection: 'row', width: '100%', columnGap: 10}}>
         <Link
           href="/signin"
           style={[
             styles.button,
-            { backgroundColor: "#6AA84F", shadowColor: "#38761d" },
+            { backgroundColor: "#6AA84F", shadowColor: "#38761d", flex: 2, },
           ]}
           asChild
         >
@@ -67,21 +70,20 @@ export default function AuthScreen() {
         </Link>
         <Link
           href="/signup"
-          style={[styles.button, { backgroundColor: "#b99510" }]}
+          style={[styles.button, { backgroundColor: "#b99510", shadowColor: '#866c0d', flex: 2 }]}
           asChild
         >
           <Pressable>
             <Text style={styles.signup}>Sign up</Text>
           </Pressable>
-        </Link>
+        </Link></View>
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
           buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
           cornerRadius={100}
-          style={styles.button}
+          style={[styles.buttonApple]}
           onPress={async () => {
-            await signInWithApple();
-            router.replace("/");
+            await signInWithApple(signIn);
           }}
         />
       </View>
@@ -134,6 +136,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderColor: "#FFF",
     borderWidth: 4,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+  },
+  buttonApple: {
+    paddingHorizontal: 25,
+    paddingVertical: 20,
+    width: "100%",
+    borderRadius: 1000,
+    marginBottom: 20,
+    textAlign: "center",
+    justifyContent: "center",
+    borderColor: "#FFF",
+    borderWidth: 8,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 1,
     shadowRadius: 0,

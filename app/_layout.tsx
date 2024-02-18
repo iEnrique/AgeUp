@@ -1,12 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
-import { useColorScheme } from "@/components/useColorScheme";
-import { View } from "react-native";
-import { SessionProvider } from "@/utilities/context/authContext";
+import { SessionProvider, useSession } from "@/utilities/context/authContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "@/firebaseConfig";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,6 +26,7 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+  const { signIn } = useSession();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -38,6 +39,14 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        signIn(user.uid);
+      }
+    });
+  }, [onAuthStateChanged]);
+
   if (!loaded) {
     return null;
   }
@@ -46,16 +55,19 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-
   return (
-
-      <SessionProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-          <Stack.Screen name="signin" options={{ presentation: "modal", headerShown: false }} />
-          <Stack.Screen name="signup" options={{ presentation: "modal", headerShown: false }} />
-        </Stack>
-      </SessionProvider>
-
+    <SessionProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="signin"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="signup"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+      </Stack>
+    </SessionProvider>
   );
 }
