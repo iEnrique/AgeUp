@@ -9,12 +9,14 @@ import { router } from "expo-router";
 const AuthContext = React.createContext<{
   signIn: (uid: string) => void;
   signOut: () => void;
+  //getUserData: () => UserModel | void;
   session?: string | null;
   user?: UserModel | null;
   isLoading: boolean;
 }>({
   signIn: () => {},
   signOut: () => {},
+  //getUserData: () => {},
   session: null,
   user: null,
   isLoading: false,
@@ -61,6 +63,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       console.log(error);
     }
   };
+
 
   const signOut = async () => {
     try {

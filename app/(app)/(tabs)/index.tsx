@@ -3,8 +3,11 @@ import { Image, ScrollView, StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { CarouselCourses } from "@/components/CarouselCourses";
 import { useSession } from "@/utilities/context/authContext";
+import LevelBar from "@/components/LevelBar";
+import { useEffect, useState } from "react";
 
 export default function TabOneScreen() {
+
   const { user } = useSession();
 
   return (
@@ -31,6 +34,8 @@ export default function TabOneScreen() {
             ></Image>
           </View>
         </View>
+        <View style={{padding: 30}}>
+        <LevelBar></LevelBar></View>
         <CarouselCourses title="Recomendations"></CarouselCourses>
         <CarouselCourses title="Continue"></CarouselCourses>
         <CarouselCourses title="Popular"></CarouselCourses>

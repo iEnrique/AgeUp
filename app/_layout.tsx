@@ -2,10 +2,10 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { SessionProvider, useSession } from "@/utilities/context/authContext";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseAuth } from "@/firebaseConfig";
 
 export {
@@ -26,9 +26,8 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
-  const { signIn } = useSession();
-
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -39,13 +38,7 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  useEffect(() => {
-    onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) {
-        signIn(user.uid);
-      }
-    });
-  }, [onAuthStateChanged]);
+  //NO HOOKS AFTER HERE
 
   if (!loaded) {
     return null;

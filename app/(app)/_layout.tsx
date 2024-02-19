@@ -7,19 +7,32 @@ import {
 } from "@react-navigation/native";
 
 import { Text, View, useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "@/firebaseConfig";
 
 export default function AppLayout() {
-  const { session, signIn, isLoading, user } = useSession();
+  const colorScheme = useColorScheme();
+  const { session, signIn, signOut, isLoading, user } = useSession();
+  const [isAuthLoading, setAuthLoading] = useState(user);
 
-  if (isLoading) {
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (userAuth) => {
+      if (userAuth) {
+        signIn(userAuth.uid);
+      }else{
+        signOut();
+      }
+    });
+  }, [onAuthStateChanged]);
+
+  if (!isAuthLoading) {
     return <Text>Loading...</Text>;
   }
 
   if (!session) {
     return <Redirect href="/auth" />;
   } else {
-    const colorScheme = useColorScheme();
-
     return (
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <View

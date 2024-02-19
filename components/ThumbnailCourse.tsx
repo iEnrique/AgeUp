@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   View,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   useColorScheme,
 } from "react-native";
 
-import * as Haptics from "expo-haptics";
+import Card from "./Card";
 
 interface Props {
   title: String;
@@ -18,27 +18,8 @@ interface Props {
 export function CourseThumbnail(props: Props) {
   const colorScheme = useColorScheme();
 
-  function vibrateDevice() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }
-
   return (
-    <View
-      style={[
-        styles.course,
-        props.style,
-        { backgroundColor: colorScheme == "dark" ? "#222" : "#DDD" },
-      ]}
-    >
-      <Pressable android_ripple={{ color: "gray" }}>
-        <Link
-          push
-          href={"/course/hola"}
-          style={styles.course}
-          onPress={vibrateDevice}
-        ></Link>
-      </Pressable>
-    </View>
+    <Card style={props.style} onPress={() => { router.push('/course/hola'); }}></Card>
   );
 }
 
