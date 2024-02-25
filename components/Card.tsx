@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     borderColor: "#222"
   },
   cardPressed: {
-    borderBottomWidth: 7,
-    marginTop: 3,
-    marginBottom: -3,
+    borderBottomWidth: 4,
+    marginTop: 4,
+    marginBottom: -4,
   }
 });

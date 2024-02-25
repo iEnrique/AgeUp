@@ -1,5 +1,6 @@
 import { View, useColorScheme } from "react-native";
 import { Subtitle } from "./Subtitle";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function LevelBar() {
   const colorScheme = useColorScheme();
@@ -25,7 +26,7 @@ export default function LevelBar() {
           }}
         ></View>
       </View>
-      <Subtitle text={"Level 1"} style={{alignSelf: 'center', marginTop: 10}}></Subtitle>
+      <Subtitle text={i18n.t('level-1')} style={{alignSelf: 'center', marginTop: 10}}></Subtitle>
     </View>
   );
 }

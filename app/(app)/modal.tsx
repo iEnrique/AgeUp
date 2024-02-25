@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import ButtonSetting from "@/components/ButtonSetting";
 import { Title } from "@/components/Title";
 import { Subtitle } from "@/components/Subtitle";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function ModalScreen() {
   const { user, signOut } = useSession();
@@ -42,15 +43,15 @@ export default function ModalScreen() {
             overflow: "hidden",
           }}
         >
-          <ButtonSetting link={'/settings/profile'} icon="brush">Profile</ButtonSetting>
-          <ButtonSetting link={'/settings/account'} icon="person">Account</ButtonSetting>
-          <ButtonSetting link={'/settings/account'} icon="lock-closed">Password</ButtonSetting>
-          <ButtonSetting link={'/settings/feedback'} icon="chatbox-ellipses">Give feedback</ButtonSetting>
+          <ButtonSetting link={'/settings/profile'} icon="brush">{i18n.t('profile')}</ButtonSetting>
+          <ButtonSetting link={'/settings/account'} icon="person">{i18n.t('account')}</ButtonSetting>
+          <ButtonSetting link={'/settings/account'} icon="lock-closed">{i18n.t('password')}</ButtonSetting>
+          <ButtonSetting link={'/settings/feedback'} icon="chatbox-ellipses">{i18n.t('give-feedback')}</ButtonSetting>
         </View>
         <View style={{ marginTop: 30, width: "100%" }}>
           <ButtonAgeup
             type="danger"
-            title="Log out"
+            title={i18n.t('logout')}
             onPress={() => {
               signOut();
               router.replace("/auth");

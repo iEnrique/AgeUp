@@ -20,6 +20,7 @@ import { schemaSignIn } from "@/utilities/validations/signin";
 
 import { RadialGradient } from "react-native-gradients";
 import { httpSignInWithEmailAndPassword } from "@/utilities/http/auth";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function SignIn() {
   const { height, width } = Dimensions.get("window");
@@ -75,7 +76,7 @@ export default function SignIn() {
         />
 
         <View style={styles.container}>
-          <Title color="#1F1F1F" text={"Log in"}></Title>
+          <Title color="#1F1F1F" text={i18n.t('login')}></Title>
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontSize: 17 }}>Are you new to AgeUp? </Text>
             <Pressable onPress={() => switchToSignUp()}>
@@ -85,7 +86,7 @@ export default function SignIn() {
           <TextInputAgeup
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholder="Email"
+            placeholder={i18n.t('email')}
             name="email"
             control={control}
           ></TextInputAgeup>
@@ -94,11 +95,11 @@ export default function SignIn() {
             secureTextEntry={true}
             name="password"
             autoCapitalize="none"
-            placeholder="Password"
+            placeholder={i18n.t('password')}
             control={control}
           ></TextInputAgeup>
           <ButtonAgeup
-            title="Log in"
+            title={i18n.t('login')}
             type="success"
             onPress={handleSubmit(async (data) => {
               httpSignInWithEmailAndPassword(

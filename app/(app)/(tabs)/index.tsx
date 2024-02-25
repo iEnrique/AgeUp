@@ -5,6 +5,7 @@ import { CarouselCourses } from "@/components/CarouselCourses";
 import { useSession } from "@/utilities/context/authContext";
 import LevelBar from "@/components/LevelBar";
 import { useEffect, useState } from "react";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function TabOneScreen() {
 
@@ -16,7 +17,7 @@ export default function TabOneScreen() {
       <View style={{width:'100%', paddingBottom: 30}}>
         <View style={styles.header}>
           <View style={{ flex: 2 }}>
-            <Text style={styles.welcome}>Welcome,</Text>
+            <Text style={styles.welcome}>{i18n.t('welcome')+","}</Text>
             <Text style={styles.name}>{user!.name}</Text>
           </View>
           <View
@@ -36,9 +37,9 @@ export default function TabOneScreen() {
         </View>
         <View style={{paddingHorizontal: 30, marginTop: 30}}>
         <LevelBar></LevelBar></View>
-        <CarouselCourses title="Recomendations"></CarouselCourses>
-        <CarouselCourses title="Continue"></CarouselCourses>
-        <CarouselCourses title="Popular"></CarouselCourses>
+        <CarouselCourses title={i18n.t('recommendations')}></CarouselCourses>
+        <CarouselCourses title={i18n.t('continue')}></CarouselCourses>
+        <CarouselCourses title={i18n.t('popular')}></CarouselCourses>
       </View>
     </ScrollView></View>
   );

@@ -5,6 +5,7 @@ import TextInputAgeup from "@/components/TextInputAgeup";
 import { View } from "@/components/Themed";
 import { useSession } from "@/utilities/context/authContext";
 import { httpSettings } from "@/utilities/http/settings";
+import { i18n } from "@/utilities/i18n/i18n.config";
 import { schemaAccount, schemaProfile } from "@/utilities/validations/settings";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
@@ -17,12 +18,7 @@ export default function SettingsAccount() {
 
   const {
     handleSubmit,
-    watch,
     control,
-    setValue,
-    getValues,
-    clearErrors,
-    formState,
   } = useForm({
     resolver: yupResolver(schemaAccount),
   });
@@ -33,10 +29,10 @@ export default function SettingsAccount() {
     <View style={styles.topContainer}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.innerGroup}>
-        <Label>Username</Label>
+        <Label>{i18n.t('username')}</Label>
         <TextInputAgeup
           autoCapitalize="none"
-          placeholder="Username"
+          placeholder={i18n.t('username')}
           value={user!.username}
           name="username"
           control={control}
@@ -46,7 +42,7 @@ export default function SettingsAccount() {
           keyboardType="email-address"
           value={user!.email}
           autoCapitalize="none"
-          placeholder="Email"
+          placeholder={i18n.t('email')}
           name="email"
           control={control}
         ></TextInputAgeup>
@@ -54,7 +50,7 @@ export default function SettingsAccount() {
         <View style={styles.innerGroup}>
           <ButtonAgeup
             type="success"
-            title="Update"
+            title={i18n.t('update')}
             isLoading={isLoading}
             onPress={handleSubmit(async (data) => {
               setIsLoading(true);
@@ -68,7 +64,7 @@ export default function SettingsAccount() {
           />
           <ButtonAgeup
             type="default"
-            title="Go back"
+            title={i18n.t('return')}
             onPress={() => router.back()}
           />
         </View>

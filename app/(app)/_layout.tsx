@@ -12,6 +12,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/firebaseConfig";
 import { set } from "react-hook-form";
 import AuthScreen from "../auth";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function AppLayout() {
   const colorScheme = useColorScheme();
@@ -53,10 +54,10 @@ export default function AppLayout() {
         >
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ title: 'Account', presentation: "modal" }} />
-            <Stack.Screen name="settings/account" options={{ title: 'Account', presentation: "modal" }} />
-            <Stack.Screen name="settings/feedback" options={{ title: 'Feedback', presentation: "modal" }} />
-            <Stack.Screen name="settings/profile" options={{ title: 'Profile', presentation: "modal" }} />
+            <Stack.Screen name="modal" options={{ title: i18n.t('settings'), presentation: "modal" }} />
+            <Stack.Screen name="settings/account" options={{ title: i18n.t('account'), presentation: "modal" }} />
+            <Stack.Screen name="settings/feedback" options={{ title: i18n.t('feedback'), presentation: "modal" }} />
+            <Stack.Screen name="settings/profile" options={{ title: i18n.t('profile'), presentation: "modal" }} />
           </Stack>
         </View>
       </ThemeProvider>

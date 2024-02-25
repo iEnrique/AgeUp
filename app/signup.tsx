@@ -39,6 +39,7 @@ import { useLocalSearchParams } from "expo-router";
 import { firebaseAuth } from "@/firebaseConfig";
 import { useSession } from "@/utilities/context/authContext";
 import GenderPicker from "@/components/GenderPicker";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function SignUp() {
   const { isCredential } = useLocalSearchParams();
@@ -291,7 +292,7 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
         </Text>
         <TextInputAgeup
           autoCapitalize="words"
-          placeholder="Name"
+          placeholder={i18n.t('name')}
           control={props.control}
           name="name"
         ></TextInputAgeup>
@@ -303,7 +304,7 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
               <>
                 <TextInputAgeup
                   placeholder="Date of birth"
-                  name="birthday"
+                  name={i18n.t('birthday')}
                   editable={false}
                   selectTextOnFocus={false}
                   control={props.control}
@@ -328,7 +329,7 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
       {props.credential ? (
         <ButtonAgeup
           type="success"
-          title="Sign up"
+          title={i18n.t('signup')}
           onPress={() => {
             props.createUsernameAndPasswordWithCredential();
 
@@ -340,7 +341,7 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
       ) : (
         <ButtonAgeup
           type="success"
-          title="Next step"
+          title={i18n.t('next-step')}
           onPress={() => {
             props.setStep(2);
           }}
@@ -348,7 +349,7 @@ function StepNameAndBirthday(props: PropsStepsNameaAndBirthday) {
       )}
       <ButtonAgeup
         type="default"
-        title="Go back"
+        title={i18n.t('return')}
         onPress={() => props.setStep(0)}
       ></ButtonAgeup>
     </>
@@ -364,7 +365,7 @@ function StepUsernameAndPassword(props: PropsSteps) {
         </Text>
         <TextInputAgeup
           autoCapitalize="none"
-          placeholder="Username"
+          placeholder={i18n.t('username')}
           name="username"
           control={props.control}
         ></TextInputAgeup>
@@ -372,7 +373,7 @@ function StepUsernameAndPassword(props: PropsSteps) {
           keyboardType="default"
           secureTextEntry={true}
           autoCapitalize="none"
-          placeholder="Password"
+          placeholder={i18n.t('password')}
           name="password"
           control={props.control}
         ></TextInputAgeup>
@@ -380,19 +381,19 @@ function StepUsernameAndPassword(props: PropsSteps) {
           keyboardType="default"
           secureTextEntry={true}
           autoCapitalize="none"
-          placeholder="Repeat password"
+          placeholder={i18n.t('repeat-password')}
           control={props.control}
           name="passwordverification"
         ></TextInputAgeup>
       </View>
       <ButtonAgeup
         type="success"
-        title="Next step"
+        title={i18n.t('next-step')}
         onPress={() => props.setStep(3)}
       ></ButtonAgeup>
       <ButtonAgeup
         type="default"
-        title="Go back"
+        title={i18n.t('return')}
         onPress={() => props.setStep(1)}
       ></ButtonAgeup>
     </>
@@ -414,14 +415,14 @@ function StepEmail(props: PropsStepsEmail) {
         <TextInputAgeup
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder="Email"
+          placeholder={i18n.t('email')}
           name="email"
           control={props.control}
         ></TextInputAgeup>
       </View>
       <ButtonAgeup
         type="success"
-        title="Next step"
+        title={i18n.t('next-step')}
         onPress={props.handleSubmit(async (data) => {
           try {
             httpSignUpWithEmailAndPassword(props.signIn, data);
@@ -432,7 +433,7 @@ function StepEmail(props: PropsStepsEmail) {
       />
       <ButtonAgeup
         type="default"
-        title="Go back"
+        title={i18n.t('return')}
         onPress={() => props.setStep(2)}
       />
     </>

@@ -5,6 +5,7 @@ import TextInputAgeup from "@/components/TextInputAgeup";
 import { View } from "@/components/Themed";
 import { useSession } from "@/utilities/context/authContext";
 import { httpSettings } from "@/utilities/http/settings";
+import { i18n } from "@/utilities/i18n/i18n.config";
 import { schemaProfile } from "@/utilities/validations/settings";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
@@ -18,12 +19,8 @@ export default function SettingsProfile() {
 
   const {
     handleSubmit,
-    watch,
     control,
     setValue,
-    getValues,
-    clearErrors,
-    formState,
   } = useForm({
     resolver: yupResolver(schemaProfile),
   });
@@ -31,7 +28,6 @@ export default function SettingsProfile() {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [gender, setGender] = useState(user!.gender);
-  const birthday = watch("birthday");
 
   //REMOVE WHEN LAUNCHING THE APP
   useEffect(() => {
@@ -47,15 +43,15 @@ export default function SettingsProfile() {
     <View style={styles.topContainer}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.innerGroup}>
-        <Label>Name</Label>
+        <Label>{i18n.t('name')}</Label>
           <TextInputAgeup
             autoCapitalize="words"
-            placeholder="Name"
+            placeholder={i18n.t('name')}
             value={user!.name}
             control={control}
             name="name"
           ></TextInputAgeup>
-          <Label>Birthday</Label>
+          <Label>{i18n.t('birthday')}</Label>
           <Controller
             control={control}
             name="birthday"
@@ -63,7 +59,7 @@ export default function SettingsProfile() {
               return (
                 <>
                   <TextInputAgeup
-                    placeholder="Date of birth"
+                    placeholder={i18n.t('birthday')}
                     name="birthday"
                     editable={false}
                     selectTextOnFocus={false}
@@ -94,7 +90,7 @@ export default function SettingsProfile() {
         <View style={styles.innerGroup}>
           <ButtonAgeup
             type="success"
-            title="Update"
+            title={i18n.t('update')}
             isLoading={isLoading}
             onPress={handleSubmit(async (data) => {
               setIsLoading(true);
@@ -108,7 +104,7 @@ export default function SettingsProfile() {
           />
           <ButtonAgeup
             type="default"
-            title="Go back"
+            title={i18n.t('return')}
             onPress={() => router.back()}
           />
         </View>

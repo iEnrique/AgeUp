@@ -15,10 +15,12 @@ import { OAuthProvider, signInWithCredential } from "firebase/auth";
 import { firebaseAuth } from "@/firebaseConfig";
 import { useSession } from "@/utilities/context/authContext";
 import { signInWithApple } from "@/utilities/http/auth";
-import { useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { i18n } from "@/utilities/i18n/i18n.config";
 
 export default function AuthScreen() {
   const backgroundMovement = new Animated.Value(0);
+  const [AppleLoginState, setAppleLoginState] = useState(<View></View>);
 
   Animated.sequence([
     Animated.delay(0),
@@ -31,6 +33,22 @@ export default function AuthScreen() {
   ]).start();
 
   const { signIn } = useSession();
+
+  async function AppleLoginRender(){
+    const response = await AppleAuthentication.isAvailableAsync();
+
+      response && setAppleLoginState(<AppleAuthentication.AppleAuthenticationButton
+      buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+      buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+      cornerRadius={100}
+      style={[styles.buttonApple]}
+      onPress={async () => {
+        await signInWithApple(signIn);
+      }}
+    />);
+  }
+
+  AppleLoginRender()
 
   return (
     <>
@@ -65,7 +83,7 @@ export default function AuthScreen() {
           asChild
         >
           <Pressable>
-            <Text style={styles.signin}>Log in</Text>
+            <Text style={styles.signin}>{i18n.t('login')}</Text>
           </Pressable>
         </Link>
         <Link
@@ -74,18 +92,10 @@ export default function AuthScreen() {
           asChild
         >
           <Pressable>
-            <Text style={styles.signup}>Sign up</Text>
+            <Text style={styles.signup}>{i18n.t('signup')}</Text>
           </Pressable>
         </Link></View>
-        <AppleAuthentication.AppleAuthenticationButton
-          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-          cornerRadius={100}
-          style={[styles.buttonApple]}
-          onPress={async () => {
-            await signInWithApple(signIn);
-          }}
-        />
+        { AppleLoginState }
       </View>
     </>
   );
