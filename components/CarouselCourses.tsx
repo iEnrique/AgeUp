@@ -10,7 +10,7 @@ export function CarouselCourses(props: Props) {
   return (
     <View>
      <Title text={props.title} style={{marginBottom: 20, marginTop: 30}}></Title>
-      <View style={{ height: 180, width: "100%" }}>
+      <View style={{ height: 210, width: "100%" }}>
         <ScrollView
           contentContainerStyle={styles.carousel}
           showsHorizontalScrollIndicator={false}
@@ -19,12 +19,16 @@ export function CarouselCourses(props: Props) {
           horizontal={true}
         >
             <CourseThumbnail
-              title="Rome"
+              title="Vikings"
               style={{ marginLeft: 30, maxWidth: 180 }}
+              thumbnail={require('@/assets/images/topics/thumbnails/vikings-thumbnail.png')}
+              color="#b78149"
             ></CourseThumbnail>
             <CourseThumbnail
-              title="The french revolution"
+              title="Anglo-saxon England"
               style={{ maxWidth: 180 }}
+              thumbnail={require('@/assets/images/topics/thumbnails/anglosaxon-thumbnail.png')}
+              color="#fce5cd"
             ></CourseThumbnail>
             <CourseThumbnail
               title="Vikings"

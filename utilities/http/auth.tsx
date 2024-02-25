@@ -9,7 +9,7 @@ import {
   TypesSchemaSignUp,
   TypesSchemaSignUpWithCredential,
 } from "../validations/signup";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useSession } from "../context/authContext";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
@@ -21,7 +21,9 @@ export async function httpSignInWithEmailAndPassword(
 ) {
   try {
     signInWithEmailAndPassword(firebaseAuth, email, password).then((data) => {
-      signIn(data.user.uid);
+      router.replace('/');
+    }).catch((error) => {
+      console.log(error);
     });
   } catch (error: any) {
     console.log(error);
@@ -45,7 +47,16 @@ export async function signInWithApple(signIn: Function) {
       const credential = provider.credential({ idToken: identityToken });
 
       await signInWithCredential(firebaseAuth, credential).then((user) => {
-        signIn(user.user.uid);
+        const userDoc = doc(firebaseFirestore, "users", user.user.uid);
+       getDoc(userDoc).then((response) => {
+        if (!response.exists()) {
+          router.push({ pathname: "/signup", params: { isCredential: 1 } });
+        }else{
+          router.replace('/');
+        }
+      });
+      }).catch((error) => {
+        console.log(error);
       });
     }
   } catch (e: any) {
@@ -70,12 +81,13 @@ export function httpSignUpWithEmailAndPassword(signIn: Function, props: TypesSch
           email: props.email,
           name: props.name,
           birthday: props.birthday,
+          gender: props.gender,
           score: 0,
         },
         { merge: true }
       )
         .then(() => {
-          signIn(userCredential.user.uid);
+          router.replace('/');
         })
         .catch((error) => console.log(error));
     })
@@ -95,14 +107,13 @@ export function httpSignUpWithCredential(
         username: props.username,
         email: props.email,
         name: props.name,
-        birthday: props.birthday,
+        birthday: props.birthday.getTime(),
+        gender: props.gender,
         score: 0,
       },
       { merge: true }
     ).then(() => {
-      signIn(uid);
+      router.replace('/');
     });
-  } else {
-    router.replace("/");
   }
 }

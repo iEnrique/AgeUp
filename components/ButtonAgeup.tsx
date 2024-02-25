@@ -1,3 +1,4 @@
+import { shadeColor } from "@/utilities/hooks/useShadeColor";
 import {
   Pressable,
   StyleProp,
@@ -8,23 +9,28 @@ import {
 
 interface Props {
   title: string;
-  type: "default" | "success";
+  type: "default" | "success" | "danger";
   style?: any;
   onPress?: () => void;
+  isLoading?: boolean;
 }
 
 export default function ButtonAgeup(props: Props) {
-  var buttonTypeStyle = styles.defaultButton;
-  var textTypeStyle = styles.defaultText;
+  var buttonTypeStyle = "#EEE";
+  var textTypeStyle = "#1F1F1F";
 
   switch (props.type) {
     case "default":
-      buttonTypeStyle = styles.defaultButton;
-      textTypeStyle = styles.defaultText;
+      buttonTypeStyle = "#EEEEEE";
+      textTypeStyle = "#1F1F1F";
       break;
     case "success":
-      buttonTypeStyle = styles.successButton;
-      textTypeStyle = styles.successText;
+      buttonTypeStyle = '#6AA84F';
+      textTypeStyle = "#FFF";
+      break;
+    case "danger":
+      buttonTypeStyle = '#d61717';
+      textTypeStyle = "#FFF";
       break;
   }
 
@@ -32,13 +38,15 @@ export default function ButtonAgeup(props: Props) {
     <Pressable
       style={({ pressed }) => [
         styles.button,
-        buttonTypeStyle,
-        pressed && styles.buttonPressed,
+        {backgroundColor: buttonTypeStyle},
+        {borderColor: shadeColor(buttonTypeStyle, -20)},
+        {opacity: props.isLoading ? 0.5 : 1},
+        pressed || props.isLoading && styles.buttonPressed,
         props.style,
       ]}
       onPress={props.onPress}
     >
-      <Text style={[styles.textButton, textTypeStyle]}>{props.title}</Text>
+      <Text style={[styles.textButton, {color: textTypeStyle}]}>{props.title}</Text>
     </Pressable>
   );
 }
@@ -70,14 +78,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#EEE",
     borderColor: "#BBB",
   },
-  defaultText: {
-    color: "#000",
-  },
   successButton: {
     backgroundColor: "#6AA84F",
     borderColor: "#38761d",
-  },
-  successText: {
-    color: "#FFF",
   },
 });

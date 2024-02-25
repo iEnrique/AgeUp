@@ -52,6 +52,7 @@ export default function TextInputAgeup(props: Props) {
     <Controller
       control={props.control}
       name={props.name}
+      defaultValue={props.value}
       rules={props.rules}
       render={({
         field: { value, onChange, onBlur },

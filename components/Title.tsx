@@ -3,12 +3,13 @@ import { StyleProp, StyleSheet, Text, TextStyle, useColorScheme } from "react-na
 interface Props {
     text: String,
     style?: StyleProp<TextStyle>,
+    color?: string,
 }
 
 export function Title(props: Props) {
   const colorScheme = useColorScheme();
 
-  return (<Text style={[styles.title, {color: colorScheme == 'dark' ? '#fff' : '#000'}, props.style]}>{props.text}</Text>);
+  return (<Text style={[styles.title, {color: props.color ? props.color : colorScheme == 'dark' ? '#fff' : '#000'}, props.style]}>{props.text}</Text>);
 }
 
 const styles = StyleSheet.create({

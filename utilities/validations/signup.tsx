@@ -1,19 +1,22 @@
 import * as yup from "yup";
+import { user } from "./yup/user";
 
 export interface TypesSchemaSignUp {
     name: string,
     birthday: Date,
     username: string,
     email: string,
-    password: string
+    password: string,
+    gender: number
 }
 
 export const schemaSignUp = yup.object().shape({
-    name: yup.string().max(15, "Name is too long").required("Name is required"),
-    birthday: yup.date().required("Birthday is required"),
-    username: yup.string().max(20, "Username is too long").required("Username is required"),
-    email: yup.string().email("Email is not valid").required("Email is required"),
-    password: yup.string().required("Password is required")
+    name: user.name,
+    birthday: user.birthday,
+    username: user.username,
+    email: user.email,
+    password: user.password,
+    gender: user.gender
 });
 
 export interface TypesSchemaSignUpWithCredential {
@@ -21,11 +24,13 @@ export interface TypesSchemaSignUpWithCredential {
     birthday: Date,
     username: string,
     email: string,
+    gender: number
 }
 
 export const schemaSignUpWithCredential = yup.object().shape({
-    name: yup.string().min(1, "Name is too short").max(15, "Name is too long").required("Name is required"),
-    birthday: yup.date().required("Birthday is required"),
-    username: yup.string().max(20, "Username is too long").required("Username is required"),
-    email: yup.string().email("Email is not valid").required("Email is required"),
+    name: user.name,
+    birthday: user.birthday,
+    username: user.username,
+    email: user.email,
+    gender: user.gender
 });

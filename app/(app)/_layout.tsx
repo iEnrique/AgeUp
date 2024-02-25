@@ -10,29 +10,39 @@ import { Text, View, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/firebaseConfig";
+import { set } from "react-hook-form";
+import AuthScreen from "../auth";
 
 export default function AppLayout() {
   const colorScheme = useColorScheme();
   const { session, signIn, signOut, isLoading, user } = useSession();
-  const [isAuthLoading, setAuthLoading] = useState(user);
+  const [auth, setAuth] = useState("loading");
 
   useEffect(() => {
+    try {
     onAuthStateChanged(firebaseAuth, (userAuth) => {
       if (userAuth) {
-        signIn(userAuth.uid);
+        console.log("ce: "+userAuth.uid);
+        signIn(userAuth.uid).then((response) => {
+          if(response == 200){
+            setAuth("logged");
+          }else if(response == 300){
+            setAuth("auth");
+          }
+        });
       }else{
-        signOut();
+        setAuth("auth")
       }
     });
+  } catch (error) {
+    console.log(error);
+  }
   }, [onAuthStateChanged]);
 
-  if (!isAuthLoading) {
-    return <Text>Loading...</Text>;
-  }
+  if (auth == "auth") {
+    return <AuthScreen></AuthScreen>;
+  } else if(auth == "logged" && user) {
 
-  if (!session) {
-    return <Redirect href="/auth" />;
-  } else {
     return (
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <View
@@ -43,10 +53,15 @@ export default function AppLayout() {
         >
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen name="modal" options={{ title: 'Account', presentation: "modal" }} />
+            <Stack.Screen name="settings/account" options={{ title: 'Account', presentation: "modal" }} />
+            <Stack.Screen name="settings/feedback" options={{ title: 'Feedback', presentation: "modal" }} />
+            <Stack.Screen name="settings/profile" options={{ title: 'Profile', presentation: "modal" }} />
           </Stack>
         </View>
       </ThemeProvider>
     );
+  }else{
+    return <Text>Loading...</Text>;
   }
 }

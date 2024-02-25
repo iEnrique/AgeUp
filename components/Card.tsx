@@ -9,21 +9,27 @@ import {
 } from "react-native";
 
 import * as Haptics from "expo-haptics";
+import { shadeColor } from "@/utilities/hooks/useShadeColor";
 
 interface Props {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onPress?: ((event?: GestureResponderEvent) => void) | null | undefined;
+  color?: string,
 }
 
 export default function Card(props: Props) {
   const colorScheme = useColorScheme();
+  const colorBackground = props.color ? {backgroundColor: props.color} : null;
+  const colorShadow = props.color ? {borderColor: shadeColor(props.color, -30)} : null;
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.card,
         colorScheme == "dark" ? styles.cardDark : styles.cardLight,
+        colorBackground,
+        colorShadow,
         props.onPress && pressed && styles.cardPressed,
         props.style
       ]}
@@ -44,7 +50,7 @@ const styles = StyleSheet.create({
   },
   cardLight: {
     backgroundColor: "#EEE",
-    borderColor: "#CCC"
+    borderColor: "#DDD"
   },
   cardDark: {
     backgroundColor: "#333",

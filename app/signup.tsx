@@ -38,6 +38,7 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { firebaseAuth } from "@/firebaseConfig";
 import { useSession } from "@/utilities/context/authContext";
+import GenderPicker from "@/components/GenderPicker";
 
 export default function SignUp() {
   const { isCredential } = useLocalSearchParams();
@@ -72,6 +73,11 @@ export default function SignUp() {
   useEffect(() => {
     setValue("birthday", new Date());
   }, [setValue]);
+
+  //NOT REMOVE THIS
+  useEffect(() => {
+    setValue("gender", gender);
+  }, [gender]);
 
   var signupBackgroundBottom = -10 as DimensionValue;
   var widthBackgroundBottom = 300;
@@ -140,9 +146,10 @@ export default function SignUp() {
         />
 
         <View style={styles.container}>
-          <Title text={"Sign up"}></Title>
+          <Title color="#1F1F1F" text={"Sign up"}></Title>
           {step == 0 && (
             <StepGender
+              control={control}
               gender={gender}
               setGender={setGender}
               setStep={setStep}
@@ -205,34 +212,15 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     aspectRatio: 1,
   },
-  genderContainer: {
-    width: 350,
-    height: 180,
-    columnGap: 30,
-    flexDirection: "row",
-  },
   stepsContainer: {
     width: 350,
     rowGap: 20,
     flexDirection: "column",
   },
-  genderButton: {
-    flex: 1,
-    overflow: "hidden",
-  },
-  genderMan: {
-    width: "190%",
-    height: "195%",
-    transform: [{ translateX: -89 }, { translateY: 2 }],
-  },
-  genderWoman: {
-    width: "190%",
-    height: "195%",
-    transform: [{ translateX: 3 }, { translateY: 2 }],
-  },
 });
 
 interface PropsStepGender {
+  control: Control<any>;
   setGender: React.Dispatch<React.SetStateAction<number>>;
   gender: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
@@ -258,46 +246,16 @@ function StepGender(props: PropsStepGender) {
           <Text style={{ fontSize: 17, fontWeight: "bold" }}>Log in</Text>
         </Pressable>
       </View>
-      <View style={styles.genderContainer}>
-        <Pressable
-          style={styles.genderButton}
-          onPress={() => {
-            props.setGender(1);
-          }}
-        >
-          <Image
-            style={[
-              styles.genderWoman,
-              {
-                transform:
-                  props.gender == 0
-                    ? [{ translateX: 5 }, { translateY: -178 }]
-                    : [{ translateX: 5 }, { translateY: 2 }],
-              },
-            ]}
-            source={require("@/assets/images/gender-radio-buttons.png")}
-          />
-        </Pressable>
-        <Pressable
-          style={styles.genderButton}
-          onPress={() => {
-            props.setGender(0);
-          }}
-        >
-          <Image
-            style={[
-              styles.genderMan,
-              {
-                transform:
-                  props.gender == 1
-                    ? [{ translateX: -150 }, { translateY: -178 }]
-                    : [{ translateX: -150 }, { translateY: 2 }],
-              },
-            ]}
-            source={require("@/assets/images/gender-radio-buttons.png")}
-          />
-        </Pressable>
-      </View>
+      <Controller
+        control={props.control}
+        name="gender"
+        defaultValue={0}
+        render={({ field, fieldState }) => {
+          return (
+            <GenderPicker setGender={props.setGender} gender={props.gender}></GenderPicker>
+          );
+        }}
+      />
       <ButtonAgeup
         title="Next step"
         type="success"
@@ -411,7 +369,7 @@ function StepUsernameAndPassword(props: PropsSteps) {
           control={props.control}
         ></TextInputAgeup>
         <TextInputAgeup
-          keyboardType="visible-password"
+          keyboardType="default"
           secureTextEntry={true}
           autoCapitalize="none"
           placeholder="Password"
@@ -419,7 +377,7 @@ function StepUsernameAndPassword(props: PropsSteps) {
           control={props.control}
         ></TextInputAgeup>
         <TextInputAgeup
-          keyboardType="visible-password"
+          keyboardType="default"
           secureTextEntry={true}
           autoCapitalize="none"
           placeholder="Repeat password"

@@ -75,7 +75,7 @@ export default function SignIn() {
         />
 
         <View style={styles.container}>
-          <Title text={"Log in"}></Title>
+          <Title color="#1F1F1F" text={"Log in"}></Title>
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontSize: 17 }}>Are you new to AgeUp? </Text>
             <Pressable onPress={() => switchToSignUp()}>
@@ -90,7 +90,7 @@ export default function SignIn() {
             control={control}
           ></TextInputAgeup>
           <TextInputAgeup
-            keyboardType="visible-password"
+            keyboardType="default"
             secureTextEntry={true}
             name="password"
             autoCapitalize="none"

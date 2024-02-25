@@ -5,8 +5,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 
 import { SessionProvider, useSession } from "@/utilities/context/authContext";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { firebaseAuth } from "@/firebaseConfig";
+
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,6 +22,8 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,

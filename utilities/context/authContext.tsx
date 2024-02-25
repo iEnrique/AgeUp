@@ -5,20 +5,23 @@ import { UserModel } from "../models/UserModel";
 import { doc, getDoc } from "firebase/firestore";
 import { useStorageState } from "../hooks/useStorageState";
 import { router } from "expo-router";
+import { AnyObject } from "yup";
 
 const AuthContext = React.createContext<{
-  signIn: (uid: string) => void;
+  signIn: (uid: string) => Promise<any>;
   signOut: () => void;
   //getUserData: () => UserModel | void;
   session?: string | null;
   user?: UserModel | null;
+  updateUser: (data: AnyObject) => void;
   isLoading: boolean;
 }>({
-  signIn: () => {},
+  signIn: () => Promise.resolve(),
   signOut: () => {},
   //getUserData: () => {},
   session: null,
   user: null,
+  updateUser: () => {},
   isLoading: false,
 });
 
@@ -45,7 +48,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       if (userData.exists()) {
         const user = userData.data();
         const newSession = {
-          userId: uid,
+          id: uid,
           username: user.username,
           name: user.name,
           birthday: user.birthday,
@@ -54,10 +57,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
         };
         setUser(newSession);
         setSession(uid);
-
-        router.replace("/");
-      } else {
-        router.push({ pathname: "/signup", params: { isCredential: 1 } });
+        return 200;
+      }else{
+        return 300;
       }
     } catch (error) {
       console.log(error);
@@ -77,11 +79,16 @@ export function SessionProvider(props: React.PropsWithChildren) {
     }
   };
 
+  const updateUser = (data: AnyObject) => {
+    setUser({...user, ...data} as UserModel);
+  }
+
   const contextValue = {
     signIn,
     signOut,
     session,
     user,
+    updateUser,
     isLoading,
   };
 

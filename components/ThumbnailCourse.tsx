@@ -4,30 +4,41 @@ import {
   StyleSheet,
   StyleProp,
   ViewStyle,
-  Pressable,
-  useColorScheme,
+  Image,
+  ImageSourcePropType,
+  Text,
 } from "react-native";
 
 import Card from "./Card";
+import { Label } from "./Label";
 
 interface Props {
   title: String;
   style?: StyleProp<ViewStyle>;
+  thumbnail?: ImageSourcePropType;
+  color?: string,
 }
 
 export function CourseThumbnail(props: Props) {
-  const colorScheme = useColorScheme();
 
   return (
-    <Card style={props.style} onPress={() => { router.push('/course/hola'); }}></Card>
+    <View style={props.style}>
+    <Card style={[styles.course]} color={props.color} onPress={() => { router.push('/course/hola'); }}>
+      { props.thumbnail != null && <Image source={props.thumbnail} style={styles.thumbnail}></Image> }
+    </Card>
+    <Label style={{alignSelf: 'center', marginTop: 8}}>{props.title}</Label>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   course: {
-    width: "100%",
-    aspectRatio: 1,
-    height: "100%",
-    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden'
   },
+  thumbnail:{
+    height: '100%',
+    width: '100%',
+  }
 });
