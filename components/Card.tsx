@@ -43,7 +43,6 @@ export default function Card(props: Props) {
 const styles = StyleSheet.create({
   card: {
     width: "100%",
-    aspectRatio: 1,
     height: "100%",
     borderRadius: 10,
     borderBottomWidth: 8,

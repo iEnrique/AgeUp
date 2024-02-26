@@ -16,29 +16,36 @@ interface Props {
   title: String;
   style?: StyleProp<ViewStyle>;
   thumbnail?: ImageSourcePropType;
-  color?: string,
+  color?: string;
 }
 
 export function CourseThumbnail(props: Props) {
-
   return (
     <View style={props.style}>
-    <Card style={[styles.course]} color={props.color} onPress={() => { router.push('/course/hola'); }}>
-      { props.thumbnail != null && <Image source={props.thumbnail} style={styles.thumbnail}></Image> }
-    </Card>
-    <Label style={{alignSelf: 'center', marginTop: 8}}>{props.title}</Label>
+      <Card
+        style={[{aspectRatio: 1}, styles.course]}
+        color={props.color}
+        onPress={() => {
+          router.push("/course/hola");
+        }}
+      >
+        {props.thumbnail != null && (
+          <Image source={props.thumbnail} style={styles.thumbnail}></Image>
+        )}
+      </Card>
+      <Label style={{ alignSelf: "center", marginTop: 8 }}>{props.title}</Label>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   course: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden'
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
   },
-  thumbnail:{
-    height: '100%',
-    width: '100%',
-  }
+  thumbnail: {
+    height: "100%",
+    width: "100%",
+  },
 });

@@ -20,5 +20,6 @@
     "logout": "Cerrar sesión",
     "signup": "Registrarse",
     "return": "Volver",
-    "update": "Actualizar"
+    "update": "Actualizar",
+    "all-topics": "Temas"
 }

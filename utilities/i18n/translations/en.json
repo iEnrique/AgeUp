@@ -20,5 +20,6 @@
     "logout": "Log out",
     "signup": "Sign up",
     "return": "Go back",
-    "update": "Update"
+    "update": "Update",
+    "all-topics": "All topics"
 }
