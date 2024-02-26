@@ -55,6 +55,7 @@ export function TabTwoScreen({ navigation }: NativeStackScreenProps<any>) {
           {search.map((data) => {
             return (
               <CourseThumbnail
+              key={data}
                 title={data}
                 style={styles.courseThumbanailSearch}
               ></CourseThumbnail>
@@ -69,6 +70,7 @@ export function TabTwoScreen({ navigation }: NativeStackScreenProps<any>) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%', //Not remove, important when search result is only one item
     display: 'flex',
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: "row",
     flexWrap: "wrap",
-    columnGap: Dimensions.get("window").width * (8.5 / 100),
+    columnGap: Dimensions.get("window").width * (8 / 100),
     padding: 30,
   },
   courseThumbanailSearch: {
