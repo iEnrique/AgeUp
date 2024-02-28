@@ -45,7 +45,7 @@ export default function ModalScreen() {
         >
           <ButtonSetting link={'/settings/profile'} icon="brush">{i18n.t('profile')}</ButtonSetting>
           <ButtonSetting link={'/settings/account'} icon="person">{i18n.t('account')}</ButtonSetting>
-          <ButtonSetting link={'/settings/account'} icon="lock-closed">{i18n.t('password')}</ButtonSetting>
+          <ButtonSetting link={'/settings/password'} icon="lock-closed">{i18n.t('password')}</ButtonSetting>
           <ButtonSetting link={'/settings/feedback'} icon="chatbox-ellipses">{i18n.t('give-feedback')}</ButtonSetting>
         </View>
         <View style={{ marginTop: 30, width: "100%" }}>

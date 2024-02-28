@@ -7,6 +7,7 @@ export interface TypesSchemaSignUp {
     username: string,
     email: string,
     password: string,
+    passwordRepeat: string,
     gender: number
 }
 
@@ -16,6 +17,7 @@ export const schemaSignUp = yup.object().shape({
     username: user.username,
     email: user.email,
     password: user.password,
+    passwordRepeat: user.passwordRepeat,
     gender: user.gender
 });
 

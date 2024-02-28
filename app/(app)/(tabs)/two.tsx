@@ -70,9 +70,9 @@ export function TabTwoScreen({ navigation }: NativeStackScreenProps<any>) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%', //Not remove, important when search result is only one item
+    minWidth: '100%', //Not remove, important when search result is only one item
     display: 'flex',
-    alignItems: "flex-start",
+    alignContent: "center",
     justifyContent: "flex-start",
   },
   title: {
@@ -81,12 +81,12 @@ const styles = StyleSheet.create({
   },
   coursesContainer: {
     display: "flex",
-    alignContent: "flex-start",
+    alignContent: "center",
     width: '100%',
     flexDirection: "row",
     flexWrap: "wrap",
-    columnGap: Dimensions.get("window").width * (8 / 100),
-    padding: 30,
+    columnGap: Dimensions.get("window").width * (5 / 100),
+    padding: '5%',
   },
   courseThumbanailSearch: {
     width: "45%",

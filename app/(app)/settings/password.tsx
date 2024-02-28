@@ -3,23 +3,23 @@ import { Label } from "@/components/Label";
 import TextInputAgeup from "@/components/TextInputAgeup";
 import { View } from "@/components/Themed";
 import { useSession } from "@/utilities/context/authContext";
-import { httpSettings } from "@/utilities/http/settings";
+import { httpSettingPassword, httpSettings } from "@/utilities/http/settings";
 import { i18n } from "@/utilities/i18n/i18n.config";
-import { schemaAccount } from "@/utilities/validations/settings";
+import { schemaAccount, schemaPassword } from "@/utilities/validations/settings";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ScrollView, StyleSheet } from "react-native";
 
-export default function SettingsAccount() {
+export default function SettingsPassword() {
   const { user, updateUser } = useSession();
 
   const {
     handleSubmit,
     control,
   } = useForm({
-    resolver: yupResolver(schemaAccount),
+    resolver: yupResolver(schemaPassword),
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,21 +28,30 @@ export default function SettingsAccount() {
     <View style={styles.topContainer}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.innerGroup}>
-        <Label>{i18n.t('username')}</Label>
+        <Label>{i18n.t('new-password')}</Label>
         <TextInputAgeup
+          keyboardType="default"
+          secureTextEntry={true}
           autoCapitalize="none"
-          placeholder={i18n.t('username')}
-          value={user!.username}
-          name="username"
+          placeholder={i18n.t('new-password')}
+          name="password"
           control={control}
         ></TextInputAgeup>
-          <Label>{i18n.t('email')}</Label>
           <TextInputAgeup
-          keyboardType="email-address"
-          value={user!.email}
+          keyboardType="default"
+          secureTextEntry={true}
           autoCapitalize="none"
-          placeholder={i18n.t('email')}
-          name="email"
+          placeholder={i18n.t('new-password-repeat')}
+          name="passwordRepeat"
+          control={control}
+        ></TextInputAgeup>
+        <Label>{i18n.t('old-password')}</Label>
+        <TextInputAgeup
+          keyboardType="default"
+          secureTextEntry={true}
+          autoCapitalize="none"
+          placeholder={i18n.t('old-password')}
+          name="oldPassword"
           control={control}
         ></TextInputAgeup>
         </View>
@@ -54,7 +63,7 @@ export default function SettingsAccount() {
             onPress={handleSubmit(async (data) => {
               setIsLoading(true);
               try {
-                await httpSettings(user!.id, updateUser, data);
+                await httpSettingPassword(data);
                 setIsLoading(false);
               } catch (error) {
                 console.log(error);

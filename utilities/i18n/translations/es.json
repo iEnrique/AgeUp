@@ -21,5 +21,8 @@
     "signup": "Registrarse",
     "return": "Volver",
     "update": "Actualizar",
-    "all-topics": "Temas"
+    "all-topics": "Temas",
+    "new-password": "Nueva contraseña",
+    "new-password-repeat": "Repita nueva contraseña",
+    "old-password": "Contraseña antigua"
 }

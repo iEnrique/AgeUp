@@ -6,5 +6,6 @@ export const user = {
     username: yup.string().max(20, "Username is too long").required("Username is required"),
     email: yup.string().email("Email is not valid").required("Email is required"),
     password: yup.string().required("Password is required"),
+    passwordRepeat: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Repeat the password again'),
     gender: yup.number().min(0).max(1).required("Gender is required")
 }

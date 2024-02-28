@@ -57,6 +57,7 @@ export default function AppLayout() {
             <Stack.Screen name="modal" options={{ title: i18n.t('settings'), presentation: "modal" }} />
             <Stack.Screen name="settings/account" options={{ title: i18n.t('account'), presentation: "modal" }} />
             <Stack.Screen name="settings/feedback" options={{ title: i18n.t('feedback'), presentation: "modal" }} />
+            <Stack.Screen name="settings/password" options={{ title: i18n.t('password'), presentation: "modal" }} />
             <Stack.Screen name="settings/profile" options={{ title: i18n.t('profile'), presentation: "modal" }} />
           </Stack>
         </View>

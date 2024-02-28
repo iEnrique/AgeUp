@@ -22,3 +22,15 @@ export const schemaAccount = yup.object().shape({
     email: user.email,
     username: user.username,
 });
+
+export interface TypesSchemaPassword {
+    password: string,
+    passwordRepeat: string,
+    oldPassword: string
+}
+
+export const schemaPassword = yup.object().shape({
+    password: user.password,
+    passwordRepeat: user.passwordRepeat,
+    oldPassword: user.password
+});

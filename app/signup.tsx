@@ -381,9 +381,9 @@ function StepUsernameAndPassword(props: PropsSteps) {
           keyboardType="default"
           secureTextEntry={true}
           autoCapitalize="none"
-          placeholder={i18n.t('repeat-password')}
+          placeholder={i18n.t('password-repeat')}
           control={props.control}
-          name="passwordverification"
+          name="passwordRepeat"
         ></TextInputAgeup>
       </View>
       <ButtonAgeup
