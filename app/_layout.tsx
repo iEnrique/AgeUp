@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 
 import { SessionProvider, useSession } from "@/utilities/context/authContext";
 
-import * as ScreenOrientation from 'expo-screen-orientation';
+import * as ScreenOrientation from "expo-screen-orientation";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -52,17 +53,19 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <SessionProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="signin"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="signup"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-      </Stack>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="signin"
+            options={{ presentation: "modal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="signup"
+            options={{ presentation: "modal", headerShown: false }}
+          />
+        </Stack>
+      </GestureHandlerRootView>
     </SessionProvider>
   );
 }

@@ -8,8 +8,7 @@ import {
 
 import { Text, View, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { firebaseAuth } from "@/firebaseConfig";
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { set } from "react-hook-form";
 import AuthScreen from "../auth";
 import { i18n } from "@/utilities/i18n/i18n.config";
@@ -17,33 +16,32 @@ import { i18n } from "@/utilities/i18n/i18n.config";
 export default function AppLayout() {
   const colorScheme = useColorScheme();
   const { session, signIn, signOut, isLoading, user } = useSession();
-  const [auth, setAuth] = useState("loading");
+  const [authState, setAuthState] = useState("loading");
 
   useEffect(() => {
     try {
-    onAuthStateChanged(firebaseAuth, (userAuth) => {
-      if (userAuth) {
-        console.log("ce: "+userAuth.uid);
-        signIn(userAuth.uid).then((response) => {
-          if(response == 200){
-            setAuth("logged");
-          }else if(response == 300){
-            setAuth("auth");
-          }
-        });
-      }else{
-        setAuth("auth")
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
-  }, [onAuthStateChanged]);
+      auth().onAuthStateChanged((userAuth) => {
+        if (userAuth) {
+            console.log("ce: " + userAuth.uid);
+          signIn(userAuth.uid).then((response) => {
+            if (response == 200) {
+              setAuthState("logged");
+            } else if (response == 300) {
+              setAuthState("auth");
+            }
+          });
+        } else {
+          setAuthState("auth");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [auth().onAuthStateChanged]);
 
-  if (auth == "auth") {
+  if (authState == "auth") {
     return <AuthScreen></AuthScreen>;
-  } else if(auth == "logged" && user) {
-
+  } else if (authState == "logged" && user) {
     return (
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <View
@@ -54,16 +52,31 @@ export default function AppLayout() {
         >
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ title: i18n.t('settings'), presentation: "modal" }} />
-            <Stack.Screen name="settings/account" options={{ title: i18n.t('account'), presentation: "modal" }} />
-            <Stack.Screen name="settings/feedback" options={{ title: i18n.t('feedback'), presentation: "modal" }} />
-            <Stack.Screen name="settings/password" options={{ title: i18n.t('password'), presentation: "modal" }} />
-            <Stack.Screen name="settings/profile" options={{ title: i18n.t('profile'), presentation: "modal" }} />
+            <Stack.Screen
+              name="modal"
+              options={{ title: i18n.t("settings"), presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="settings/account"
+              options={{ title: i18n.t("account"), presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="settings/feedback"
+              options={{ title: i18n.t("feedback"), presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="settings/password"
+              options={{ title: i18n.t("password"), presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="settings/profile"
+              options={{ title: i18n.t("profile"), presentation: "modal" }}
+            />
           </Stack>
         </View>
       </ThemeProvider>
     );
-  }else{
+  } else {
     return <Text>Loading...</Text>;
   }
 }

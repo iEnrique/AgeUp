@@ -27,6 +27,7 @@ import {
   schemaSignUp,
   schemaSignUpWithCredential,
 } from "@/utilities/validations/signup";
+import auth from "@react-native-firebase/auth";
 
 import DatePicker from "react-native-date-picker";
 
@@ -36,7 +37,6 @@ import {
   httpSignUpWithEmailAndPassword,
 } from "@/utilities/http/auth";
 import { useLocalSearchParams } from "expo-router";
-import { firebaseAuth } from "@/firebaseConfig";
 import { useSession } from "@/utilities/context/authContext";
 import GenderPicker from "@/components/GenderPicker";
 import { i18n } from "@/utilities/i18n/i18n.config";
@@ -104,13 +104,13 @@ export default function SignUp() {
   ];
 
   function createUsernameAndPasswordWithCredential() {
-    const email = firebaseAuth.currentUser?.email;
+    const email = auth().currentUser?.email;
     if (email == null) {
       signOut();
     } else {
       const name =
-        firebaseAuth.currentUser?.displayName != null
-          ? firebaseAuth.currentUser.displayName.toLowerCase()
+        auth().currentUser?.displayName != null
+          ? auth().currentUser!.displayName!.toLowerCase()
           : "user";
       const random = Math.floor(Math.random() * (9999999 - 1 + 1)) + 1;
       setValue("username", name + random);

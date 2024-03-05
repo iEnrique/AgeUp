@@ -1,18 +1,14 @@
-import { firebaseAuth, firebaseFirestore } from "@/firebaseConfig";
-import {
-  OAuthProvider,
-  createUserWithEmailAndPassword,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {
   TypesSchemaSignUp,
   TypesSchemaSignUpWithCredential,
 } from "../validations/signup";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useSession } from "../context/authContext";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
+
+import { appleAuth } from '@invertase/react-native-apple-authentication';
 
 export async function httpSignInWithEmailAndPassword(
   signIn: Function,
@@ -20,7 +16,7 @@ export async function httpSignInWithEmailAndPassword(
   password: string
 ) {
   try {
-    signInWithEmailAndPassword(firebaseAuth, email, password).then((data) => {
+    auth().signInWithEmailAndPassword(email, password).then((data) => {
       router.replace('/');
     }).catch((error) => {
       console.log(error);
@@ -30,26 +26,27 @@ export async function httpSignInWithEmailAndPassword(
   }
 }
 
-export async function signInWithApple(signIn: Function) {
+export async function signInWithApple() {
   try {
-    const credential = await AppleAuthentication.signInAsync({
-      requestedScopes: [
-        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-        AppleAuthentication.AppleAuthenticationScope.EMAIL,
-      ],
-    });
-    // signed in
-    const { identityToken } = credential;
-    if (identityToken) {
-      const provider = new OAuthProvider("apple.com");
-      provider.addScope("email");
-      provider.addScope("name");
-      const credential = provider.credential({ idToken: identityToken });
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
 
-      await signInWithCredential(firebaseAuth, credential).then((user) => {
-        const userDoc = doc(firebaseFirestore, "users", user.user.uid);
-       getDoc(userDoc).then((response) => {
-        if (!response.exists()) {
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
+
+      // Ensure Apple returned a user identityToken
+  if (!appleAuthRequestResponse.identityToken) {
+    throw new Error('Apple Sign-In failed - no identify token returned');
+  }
+    // signed in
+    const { identityToken, nonce } = appleAuthRequestResponse;
+    if (identityToken) {
+      const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+
+      await auth().signInWithCredential(appleCredential).then((user) => {
+        const userDoc = firestore().collection("users").doc(user.user.uid);
+       userDoc.get().then((response) => {
+        if (!response.exists) {
           router.push({ pathname: "/signup", params: { isCredential: 1 } });
         }else{
           router.replace('/');
@@ -72,10 +69,9 @@ export async function signInWithApple(signIn: Function) {
 export function httpSignUpWithEmailAndPassword(signIn: Function, props: TypesSchemaSignUp) {
   //Check if somebody has the same username
 
-  createUserWithEmailAndPassword(firebaseAuth, props.email, props.password)
+  auth().createUserWithEmailAndPassword(props.email, props.password)
     .then((userCredential) => {
-      setDoc(
-        doc(firebaseFirestore, "users", userCredential.user.uid),
+      firestore().collection("users").doc(userCredential.user.uid).set(
         {
           username: props.username,
           email: props.email,
@@ -99,10 +95,9 @@ export function httpSignUpWithCredential(
   props: TypesSchemaSignUpWithCredential
 ) {
   //Check if somebody has the same username
-  const uid = firebaseAuth.currentUser?.uid;
+  const uid = auth().currentUser?.uid;
   if (uid != null) {
-    setDoc(
-      doc(firebaseFirestore, "users", uid),
+    firestore().collection("users").doc(uid).set(
       {
         username: props.username,
         email: props.email,

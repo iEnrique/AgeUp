@@ -690,3 +690,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Content
+assets/content.json

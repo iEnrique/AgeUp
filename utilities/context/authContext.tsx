@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { firebaseAuth, firebaseFirestore } from "@/firebaseConfig";
-import { signOut as signOutFirebase } from "firebase/auth";
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import { UserModel } from "../models/UserModel";
-import { doc, getDoc } from "firebase/firestore";
 import { useStorageState } from "../hooks/useStorageState";
-import { router } from "expo-router";
 import { AnyObject } from "yup";
 
 const AuthContext = React.createContext<{
@@ -42,18 +40,17 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const signIn = async (uid: string) => {
     try {
-      const userDoc = doc(firebaseFirestore, "users", uid);
-      const userData = await getDoc(userDoc);
+      const userData = await firestore().collection("users").doc(uid).get();
 
-      if (userData.exists()) {
+      if (userData.exists) {
         const user = userData.data();
         const newSession = {
           id: uid,
-          username: user.username,
-          name: user.name,
-          birthday: user.birthday,
-          email: user.email,
-          gender: user.gender,
+          username: user!.username,
+          name: user!.name,
+          birthday: user!.birthday,
+          email: user!.email,
+          gender: user!.gender,
         };
         setUser(newSession);
         setSession(uid);
@@ -69,7 +66,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const signOut = async () => {
     try {
-      await signOutFirebase(firebaseAuth);
+      await auth().signOut();
 
       setSession(null);
       setUser(null);

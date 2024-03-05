@@ -1,20 +1,11 @@
-import { firebaseApp, firebaseFirestore } from "@/firebaseConfig";
-import { useSession } from "../context/authContext";
 import {
   TypesSchemaAccount,
   TypesSchemaPassword,
   TypesSchemaProfile,
 } from "../validations/settings";
-import { doc, setDoc } from "firebase/firestore";
 import { router } from "expo-router";
-import {
-  EmailAuthProvider,
-  getAuth,
-  reauthenticateWithCredential,
-  updatePassword,
-} from "firebase/auth";
-import * as firebase from "firebase/app";
-import "firebase/auth";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export function httpSettings(
   uid: string,
@@ -24,7 +15,7 @@ export function httpSettings(
   //Check if somebody has the same username
   return new Promise((resolve, reject) => {
     if (uid != null) {
-      setDoc(doc(firebaseFirestore, "users", uid), data, { merge: true }).then(
+      firestore().collection("users").doc(uid).set(data, { merge: true }).then(
         () => {
           updateUser(data);
           router.back();
@@ -39,17 +30,17 @@ export function httpSettingPassword(
   data: TypesSchemaPassword
 ) {
   return new Promise((resolve, reject) => {
-    var user = getAuth().currentUser;
+    var user = auth().currentUser;
 
     if (user != null && user.email != null) {
-      var credential = EmailAuthProvider.credential(
+      var credential = auth.EmailAuthProvider.credential(
         user.email,
         data.oldPassword
       );
 
-      reauthenticateWithCredential(user, credential)
+      user.reauthenticateWithCredential(credential)
         .then(function () {
-          updatePassword(user!, data.password)
+          user!.updatePassword(data.password)
             .then(() => {
               resolve(undefined);
             })

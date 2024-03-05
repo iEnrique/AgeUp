@@ -50,10 +50,26 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="courses"
         options={{
-          title: i18n.t('all-topics'),
+          title: i18n.t('courses'),
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="flashbacks"
+        options={{
+          title: i18n.t('flashbacks'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="flash" color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: i18n.t('search'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
           headerShown: false,
         }}
       />
